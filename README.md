@@ -19,3 +19,6 @@ Follow this project board to know the latest status of the project
 - Specify additional library to download if needed 
 - What file and target to compile and run. 
 - What is expected to happen when the app start. 
+
+# Authors
+- Gabriel Carvalho
