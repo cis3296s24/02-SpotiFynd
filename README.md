@@ -22,3 +22,4 @@ Follow this project board to know the latest status of the project
 
 # Authors
 - Gabriel Carvalho
+- Animish Tenneti
