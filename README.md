@@ -23,4 +23,6 @@ Follow this project board to know the latest status of the project
 
 # Authors
 - Gabriel Carvalho
+- Addison Migash
 - Animish Tenneti
+- Matthew Christofas
