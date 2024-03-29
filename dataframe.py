@@ -4,21 +4,34 @@ import os
 from IPython.display import HTML
 
 def create_dataframe(track_data):
-    #create dataframe with basic default information (Artist, Song title, Album Artwork URL)
+    
+# Create a DataFrame from the track data
     df = pd.DataFrame(track_data)
     
-    # Convert the Album Artwork URL column to HTML
+    # onvert the Album Artwork URL column to HTML
     df["Art"] = df["Art"].apply(lambda url: f'<img src="{url}" width="50" >')
     
-    #offset dataframe so top row is 1
+    #Offset the DataFrame index so the top row is 1
     df.index += 1
     
-    # Display the DataFrame
+    #Convert the DataFrame to HTML and center the text
+    df_html = df.to_html(classes='mystyle', escape=False)
     
-    #save df to a HTML file
-    df.to_html('df.html', escape=False)
+    #Center the text
+    css = """
+    <style>
+    .mystyle thead th, .mystyle tbody td{
+        text-align: center;
+    }
+    </style>
+    """
     
-    #open created HTML file
+    #Save the DataFrame to an HTML file
+    with open('df.html', 'w') as f:
+        f.write(css)
+        f.write(df_html)
+    
+    #Open the HTML file
     webbrowser.open('file://' + os.path.realpath('df.html'))
     
     return df
