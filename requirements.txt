@@ -1,0 +1,7 @@
+#list of requirements to be installed using pip
+#to run: pip install -r requirements.txts
+
+spotipy
+typer
+pandas
+IPython
