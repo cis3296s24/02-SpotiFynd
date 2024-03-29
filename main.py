@@ -19,7 +19,15 @@ def uri_from_artist(name: str):
 @app.command()
 def top_tracks(artist: str):
     results = spotify.artist_top_tracks(artist_id=uri_from_artist(artist), country="US")
-    track_data = [{"artist": track["artists"][0]["name"], "song_title": track["name"]} for track in results["tracks"]]
+    track_data = [
+        {
+        #always displayed information
+        "Art": track["album"]["images"][0]["url"],
+        "Artist": track["artists"][0]["name"], 
+        "Song": track["name"] 
+        }
+        for track in results["tracks"]
+    ]
     df = create_dataframe(track_data)
 
 if __name__ == "__main__":
