@@ -26,3 +26,4 @@ Follow this project board to know the latest status of the project
 - Addison Migash
 - Animish Tenneti
 - Matthew Christofas
+- Dennis Yeom
