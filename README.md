@@ -5,24 +5,67 @@ There are many Spotify command-line apps (For instance, Spotify-cli), but most h
 
 Proof of feasibility: https://github.com/tuo20482/spotify-data-cli
 
-# How to run
-Provide here instructions on how to use your application.   
-- Download the latest binary from the Release section on the right on GitHub.  
+## Prerequisites
+- Python 3.8 or higher
+- A Spotify Developer account and your own Client ID and Client Secret for accessing the Spotify Web API
 
-# How to contribute
-Follow this project board to know the latest status of the project
+## Installation
+1. Clone this repository to your local machine.
+2. Navigate to the cloned directory.
+3. It is recommended to create a virtual environment for this project:
+```
+python -m venv venv
+```
+4. Activate the virtual environment:
+- On Windows:
+  ```
+  .\venv\Scripts\activate
+  ```
+- On macOS and Linux:
+  ```
+  source venv/bin/activate
+  ```
+5. Install the required dependencies:
+```
+pip install spotipy typer
+```
 
-### How to build
-- Use this github repository: ... 
-- Specify what branch to use for a more stable release or for cutting edge development.  
-- Use InteliJ 11
-- Specify additional library to download if needed 
-- What file and target to compile and run. 
-- What is expected to happen when the app start.
-- What is expected to happen when the app start. 
+## Configuration
+Before running the application, you need to set up your Spotify API credentials. Set your Client ID and Client Secret as environment variables:
+- On Windows:
+```
+set SPOTIPY_CLIENT_ID=your_client_id_here
+set SPOTIPY_CLIENT_SECRET=your_client_secret_here
+```
+- On macOS and Linux:
+```
+export SPOTIPY_CLIENT_ID=your_client_id_here
+export SPOTIPY_CLIENT_SECRET=your_client_secret_here
+```
+*** To get a client ID and client secret, you must sign up for Spotipy's web API. Follow below instructions to do so. ***
+1. Browse to https://developer.spotify.com/dashboard/applications.
+
+2. Log in with your Spotify account.
+
+3. Click on ‘Create an app’.
+
+4. Pick an ‘App name’ and ‘App description’ of your choice and mark the checkboxes. For your URI you can use http://localhost/.
+
+5. After creation, you see your ‘Client Id’ and you can click on ‘Show client secret` to unhide your ’Client secret’.
+
+6. Use your ‘Client id’ and ‘Client secret’ to retrieve a token from the Spotify API.
+
+## Running the Application
+To run the application, use the following command:
+```
+python main.py "artist name"
+```
+
 
 # Authors
 - Gabriel Carvalho
 - Addison Migash
 - Animish Tenneti
 - Matthew Christofas
+- Justin Means
+- Dennis Yeom
