@@ -18,7 +18,6 @@ def uri_from_search(name: str, search_type: str):
     else:
         raise ValueError(f"No {search_type}s found with the name {name}")
 
-
 @app.command()
 #top_tracks passed arguments based on flags such as -a or -s
 def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
@@ -48,6 +47,11 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
         raise ValueError("You must provide either an artist (-a) or a song (-s).")
     ids = uri_from_search(name, search_type)
     track_data = []
+    
+    #corresponding to 0-11 value for -p search
+    pitch_names = ['C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B']
+    
+    #track search includes search types: song title, pitch,
     if search_type == "track":
         for id in ids:
             if pitch is not None:
@@ -59,7 +63,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                         "Art": results["album"]["images"][0]["url"],
                         "Artist": results["artists"][0]["name"], 
                         "Song": results["name"],
-                        "Pitch": pitch_feature["key"]
+                        "Pitch": pitch_names[pitch_feature["key"]]
                     }
                     track_data.append(track_info)
             else:
