@@ -60,23 +60,15 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
             if tempo is not None:   # if tempo flagged was passed...
                 # only pull audio features if tempo is specified
                 tempo_feature = spotify.audio_features(id)[0]
-                if tempo_feature is not None and tempo_feature["tempo"] is not None and tempo_feature["tempo"] == int(tempo):
+                if tempo_feature is not None and tempo_feature["tempo"] is not None and int(tempo_feature["tempo"]) == int(tempo):
                     results = spotify.track(id)
                     track_info = {
                         "Art": results["album"]["images"][0]["url"],
                         "Artist": results["artists"][0]["name"], 
                         "Song": results["name"],
-                        "Tempo": tempo_feature["tempo"]
+                        "Tempo": int(tempo_feature["tempo"])
                     }
                     track_data.append(track_info)
-            else:
-                results = spotify.track(id)
-                track_info = {
-                    "Art": results["album"]["images"][0]["url"],
-                    "Artist": results["artists"][0]["name"], 
-                    "Song": results["name"]
-                }
-                track_data.append(track_info)
 
             if pitch is not None:
                 # only pull audio features if pitch if specified
