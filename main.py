@@ -7,27 +7,39 @@ spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 app = typer.Typer()
 
 
-def uri_from_artist(name: str):
-    results = spotify.search(q="artist:" + name, type="artist")
-    items = results["artists"]["items"]
+def uri_from_search(name: str, search_type: str):
+    results = spotify.search(q=f"{search_type}:" + name, type=search_type)
+    items = results[search_type + "s"]["items"]
     if len(items) > 0:
-        return items[0]["id"]
+        return [item["id"] for item in items]
     else:
-        raise ValueError(f"No artists found with the name {name}")
+        raise ValueError(f"No {search_type}s found with the name {name}")
 
 
 @app.command()
-def top_tracks(artist: str):
-    results = spotify.artist_top_tracks(artist_id=uri_from_artist(artist), country="US")
-    track_data = [
-        {
-        #always displayed information
-        "Art": track["album"]["images"][0]["url"],
-        "Artist": track["artists"][0]["name"], 
-        "Song": track["name"] 
-        }
-        for track in results["tracks"]
-    ]
+def top_tracks(name: str = typer.Option(None, '-n', '--name'), search_type: str = typer.Option("artist", '-t', '--type'), song: str = typer.Option(None, '-s', '--song')):
+    if song:
+        search_type = "track"
+        name = song
+    ids = uri_from_search(name, search_type)
+    track_data = []
+    if search_type == "track":
+        for id in ids:
+            results = spotify.track(id)
+            track_data.append({
+                "Art": results["album"]["images"][0]["url"],
+                "Artist": results["artists"][0]["name"], 
+                "Song": results["name"] 
+            })
+    else:
+        for id in ids:
+            results = spotify.artist_top_tracks(artist_id=id, country="US")
+            for track in results["tracks"]:
+                track_data.append({
+                    "Art": track["album"]["images"][0]["url"],
+                    "Artist": track["artists"][0]["name"], 
+                    "Song": track["name"] 
+                })
     df = create_dataframe(track_data)
 
 if __name__ == "__main__":
