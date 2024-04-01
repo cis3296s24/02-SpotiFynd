@@ -23,7 +23,8 @@ def uri_from_search(name: str, search_type: str):
 #top_tracks passed arguments based on flags such as -a or -s
 def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                song: str = typer.Option(None, '-s', '--song'),
-               pitch: str = typer.Option(None, '-p', '--pitch')):
+               pitch: str = typer.Option(None, '-p', '--pitch'),
+               tempo: int = typer.Option(None, '-t', '-tempo')):
     
     print("\t   _________              __  .__  _____                  .___")
     print("\t  /   _____/_____   _____/  |_|__|/ ____\__.__. ____    __| _/")
@@ -40,6 +41,11 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
     elif song:
         search_type = "track"
         name = song
+
+    elif tempo:
+        search_type = "track"
+        name = str(tempo)
+
     #pitch flag passed. Corresponds to 0-11 value
     elif pitch:
         search_type = "track"
@@ -48,8 +54,30 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
         raise ValueError("You must provide either an artist (-a) or a song (-s).")
     ids = uri_from_search(name, search_type)
     track_data = []
+
     if search_type == "track":
         for id in ids:
+            if tempo is not None:   # if tempo flagged was passed...
+                # only pull audio features if tempo is specified
+                tempo_feature = spotify.audio_features(id)[0]
+                if tempo_feature is not None and tempo_feature["tempo"] is not None and tempo_feature["tempo"] == int(tempo):
+                    results = spotify.track(id)
+                    track_info = {
+                        "Art": results["album"]["images"][0]["url"],
+                        "Artist": results["artists"][0]["name"], 
+                        "Song": results["name"],
+                        "Tempo": tempo_feature["tempo"]
+                    }
+                    track_data.append(track_info)
+            else:
+                results = spotify.track(id)
+                track_info = {
+                    "Art": results["album"]["images"][0]["url"],
+                    "Artist": results["artists"][0]["name"], 
+                    "Song": results["name"]
+                }
+                track_data.append(track_info)
+
             if pitch is not None:
                 # only pull audio features if pitch if specified
                 pitch_feature = spotify.audio_features(id)[0]
