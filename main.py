@@ -24,6 +24,14 @@ def uri_from_search(name: str, search_type: str):
 def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                song: str = typer.Option(None, '-s', '--song'),
                pitch: str = typer.Option(None, '-p', '--pitch')):
+    
+    print("\t   _________              __  .__  _____                  .___")
+    print("\t  /   _____/_____   _____/  |_|__|/ ____\__.__. ____    __| _/")
+    print("\t  \_____  \\____ \ /  _ \   __\  \   __<   |  |/    \  / __ | ")
+    print("\t  /        \  |_> >  <_> )  | |  ||  |  \___  |   |  \/ /_/ | ")
+    print("\t /_______  /   __/ \____/|__| |__||__|  / ____|___|  /\____ | ")
+    print("\t         \/|__|                         \/         \/      \/ ")
+    
     #artist flag passed limited to 10 results
     if artist:
         search_type = "artist"
