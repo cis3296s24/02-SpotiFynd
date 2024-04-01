@@ -17,10 +17,15 @@ def uri_from_search(name: str, search_type: str):
 
 
 @app.command()
-def top_tracks(name: str = typer.Option(None, '-n', '--name'), search_type: str = typer.Option("artist", '-t', '--type'), song: str = typer.Option(None, '-s', '--song')):
+def top_tracks(artist: str = typer.Option(None, '-a', '--artist'), song: str = typer.Option(None, '-s', '--song')):
     if song:
         search_type = "track"
         name = song
+    elif artist:
+        search_type = "artist"
+        name = artist
+    else:
+        raise ValueError("You must provide either an artist (-a) or a song (-s).")
     ids = uri_from_search(name, search_type)
     track_data = []
     if search_type == "track":
@@ -41,6 +46,5 @@ def top_tracks(name: str = typer.Option(None, '-n', '--name'), search_type: str 
                     "Song": track["name"] 
                 })
     df = create_dataframe(track_data)
-
 if __name__ == "__main__":
     app()
