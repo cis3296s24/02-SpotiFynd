@@ -9,7 +9,7 @@ app = typer.Typer()
 
 def uri_from_search(name: str, search_type: str):
     #limit determines amount of results, artist and album are limited to 10 results via API
-    results = spotify.search(q=f"{search_type}:" + name, type=search_type, limit=10)
+    results = spotify.search(q=f"{search_type}:" + name, type=search_type, limit=50)
     items = results[search_type + "s"]["items"]
     #prints the amount of results
     print(f"Number of results: {len(items)}")
@@ -18,10 +18,11 @@ def uri_from_search(name: str, search_type: str):
     else:
         raise ValueError(f"No {search_type}s found with the name {name}")
 
+#Retrieves track information and features from the Spotify API
 def get_track_info_and_features(ids: list):
-    results = spotify.tracks(ids)
-    features = spotify.audio_features(ids)
-    all_info = []
+    results = spotify.tracks(ids) #for artist, song, album
+    features = spotify.audio_features(ids) #for tempo, pitch, etc
+    all_info = [] #list of both track info and features
 
     for i in range(len(ids)):
         track_info = {
@@ -29,7 +30,7 @@ def get_track_info_and_features(ids: list):
             "Artist": results["tracks"][i]["artists"][0]["name"], 
             "Song": results["tracks"][i]["name"],
         }
-        all_info.append((track_info, features[i]))
+        all_info.append((track_info, features[i])) #appends track info and features to all_info
 
     return all_info
 
@@ -63,20 +64,21 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
     #corresponding to 0-11 value for -p search
     pitch_names = ['C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B']
     
-    #track search includes search types: song title, pitch,
+    #track search
     if search_type == "track":
         all_info = get_track_info_and_features(ids)
         for track_info, features in all_info:
+            #pitch flag was passed
             if pitch is not None and features["key"] == int(pitch):
                 track_info["Pitch"] = pitch_names[features["key"]]
-                track_data.append(track_info)
-
+                track_data.append(track_info) #appends track info to track_data for df
+            #tempo flag was passed
             if tempo is not None:
                 min_tempo, max_tempo = map(float, tempo.split('-'))
                 if min_tempo <= features["tempo"] <= max_tempo:
                     track_info["Tempo"] = features["tempo"]
-                    track_data.append(track_info)
-
+                    track_data.append(track_info) #appends track info to track_data for df
+            #no flags were passed
             if pitch is None and tempo is None:
                 track_data.append(track_info)
     #Artist search
@@ -85,17 +87,20 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
             results = spotify.artist_top_tracks(artist_id=id, country="US")
             track_ids = [track["id"] for track in results["tracks"]]
             if track_ids:
-                all_info = get_track_info_and_features(track_ids)
-                
+                all_info = get_track_info_and_features(track_ids) #gets track info and features
+                #for all requested info
                 for track_info, features in all_info:
+                    #if pitch flag was passed
                     if pitch is not None and features["key"] == int(pitch):
                         track_info["Pitch"] = pitch_names[features["key"]]
                         track_data.append(track_info)
-                    elif tempo is not None:
+                    #if tempo flag was passed
+                    if tempo is not None:
                         min_tempo, max_tempo = map(float, tempo.split('-'))
                         if min_tempo <= features["tempo"] <= max_tempo:
                             track_info["Tempo"] = features["tempo"]
                             track_data.append(track_info)
+                    #if no flags were passed
                     else:
                         track_data.append(track_info)       
     df = create_dataframe(track_data)
