@@ -102,7 +102,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                         track_data.append(track_info)
                     #if tempo flag was passed
                     if tempo is not None:
-                        min_tempo, max_tempo = map(float, tempo.split('-'))
+                        min_tempo, max_tempo = map(float, tempo.split('-')) #
                         if min_tempo <= features["tempo"] <= max_tempo:
                             track_info["Tempo"] = features["tempo"]
                             track_data.append(track_info)
