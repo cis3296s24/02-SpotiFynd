@@ -24,11 +24,28 @@ def uri_from_search(name: str, search_type: str):
     else:
         raise ValueError(f"No {search_type}s found with the name {name}")
 
+#Retrieves track information and features from the Spotify API
+def get_track_info_and_features(ids: list):
+    results = spotify.tracks(ids) #for artist, song, album
+    features = spotify.audio_features(ids) #for tempo, pitch, etc
+    all_info = [] #list of both track info and features
+
+    for i in range(len(ids)):
+        track_info = {
+            "Art": results["tracks"][i]["album"]["images"][0]["url"],
+            "Artist": results["tracks"][i]["artists"][0]["name"], 
+            "Song": results["tracks"][i]["name"],
+        }
+        all_info.append((track_info, features[i])) #appends track info and features to all_info
+
+    return all_info
+
 @app.command()
 #top_tracks passed arguments based on flags such as -a or -s
 def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                song: str = typer.Option(None, '-s', '--song'),
-               pitch: str = typer.Option(None, '-p', '--pitch')):
+               pitch: str = typer.Option(None, '-p', '--pitch'),
+               tempo: str = typer.Option(None, '-t', '--tempo')):
     
     print("\t   _________              __  .__  _____                  .___")
     print("\t  /   _____/_____   _____/  |_|__|/ ____\__.__. ____    __| _/")
@@ -42,13 +59,9 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
         search_type = "artist"
         name = artist
     #song flag passed limited by limit= in uri_from_search
-    elif song:
+    elif song or tempo or pitch:
         search_type = "track"
         name = song
-    #pitch flag passed. Corresponds to 0-11 value
-    elif pitch:
-        search_type = "track"
-        name = pitch
     else:
         raise ValueError("You must provide either an artist (-a) or a song (-s).")
     ids = uri_from_search(name, search_type)
@@ -57,38 +70,45 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
     #corresponding to 0-11 value for -p search
     pitch_names = ['C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B']
     
-    #track search includes search types: song title, pitch,
+    #track search
     if search_type == "track":
-        for id in ids:
-            if pitch is not None:
-                # only pull audio features if pitch if specified
-                pitch_feature = spotify.audio_features(id)[0]
-                if pitch_feature is not None and pitch_feature["key"] is not None and pitch_feature["key"] == int(pitch):
-                    results = spotify.track(id)
-                    track_info = {
-                        "Art": results["album"]["images"][0]["url"],
-                        "Artist": results["artists"][0]["name"], 
-                        "Song": results["name"],
-                        "Pitch": pitch_names[pitch_feature["key"]]
-                    }
-                    track_data.append(track_info)
-            else:
-                results = spotify.track(id)
-                track_info = {
-                    "Art": results["album"]["images"][0]["url"],
-                    "Artist": results["artists"][0]["name"], 
-                    "Song": results["name"]
-                }
+        all_info = get_track_info_and_features(ids)
+        for track_info, features in all_info:
+            #pitch flag was passed
+            if pitch is not None and features["key"] == int(pitch):
+                track_info["Pitch"] = pitch_names[features["key"]]
+                track_data.append(track_info) #appends track info to track_data for df
+            #tempo flag was passed
+            if tempo is not None:
+                min_tempo, max_tempo = map(float, tempo.split('-'))
+                if min_tempo <= features["tempo"] <= max_tempo:
+                    track_info["Tempo"] = features["tempo"]
+                    track_data.append(track_info) #appends track info to track_data for df
+            #no flags were passed
+            if pitch is None and tempo is None:
                 track_data.append(track_info)
+    #Artist search
     else:
         for id in ids:
             results = spotify.artist_top_tracks(artist_id=id, country="US")
-            for track in results["tracks"]:
-                track_data.append({
-                    "Art": track["album"]["images"][0]["url"],
-                    "Artist": track["artists"][0]["name"], 
-                    "Song": track["name"] 
-                })
+            track_ids = [track["id"] for track in results["tracks"]]
+            if track_ids:
+                all_info = get_track_info_and_features(track_ids) #gets track info and features
+                #for all requested info
+                for track_info, features in all_info:
+                    #if pitch flag was passed
+                    if pitch is not None and features["key"] == int(pitch):
+                        track_info["Pitch"] = pitch_names[features["key"]]
+                        track_data.append(track_info)
+                    #if tempo flag was passed
+                    if tempo is not None:
+                        min_tempo, max_tempo = map(float, tempo.split('-'))
+                        if min_tempo <= features["tempo"] <= max_tempo:
+                            track_info["Tempo"] = features["tempo"]
+                            track_data.append(track_info)
+                    #if no flags were passed
+                    else:
+                        track_data.append(track_info)       
     df = create_dataframe(track_data)
 if __name__ == "__main__":
     app()
