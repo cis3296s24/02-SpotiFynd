@@ -39,7 +39,7 @@ def create_dataframe(track_data):
     """
     
     #Save the DataFrame to an HTML file
-    with open('df.html', 'w') as f:
+    with open('df.html', 'w', encoding='utf-8') as f:
         f.write(css)
         f.write(js)
         f.write(df_html)
