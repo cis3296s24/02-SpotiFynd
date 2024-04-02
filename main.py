@@ -7,7 +7,7 @@ from skip_auth import access_token
 # Doesn't allow personal features such as playlist access, 
 # but removes the need for username/password.
 # Could be a launch option in the future?
-spotify = spotipy.Spotify(auth=skip_auth.access_token()) 
+spotify = spotipy.Spotify(auth=access_token()) 
 
 #spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 app = typer.Typer()
