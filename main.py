@@ -151,5 +151,114 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                     else:
                         track_data.append(track_info)       
     df = create_dataframe(track_data)
+
+
+AUDIO_FEATURES = {
+    "acousticness": float,
+    "danceability": float,
+    "duration_ms": int,
+    "energy": float,
+    "instrumentalness": float,
+    "key": int,
+    "liveness": float,
+    "loudness": float,
+    "mode": int,
+    "speechiness": float,
+    "tempo": float,
+    "valence": float,
+    "popularity": int,
+    "time_signature": int,
+}
+
+
+def artists_from_string(string: str) -> list[str]:
+    return [uri_from_search(artist.strip(), "artist")[0] for artist in string.split(",")]
+
+
+def tracks_from_string(string: str) -> list[str]:
+    return [uri_from_search(track.strip(), "track")[0] for track in string.split(",")]
+
+
+def genres_from_string(string: str) -> list[str]:
+    return [genre.strip() for genre in string.split(",")]
+
+
+@app.command(help="""
+
+Search for tracks based on audio features. Note: at least one of {artists, genres, tracks} is required, and their combined total cannot exceed five. 
+
+For all numerical values, you can provide a range with a dash.
+
+For example, -t 100-120 will return tracks with a tempo between 100 and 120.
+
+For artists, genres, and tracks, you can provide a comma-separated list
+
+For example, -a "artist1, artist2" will return tracks by artists similar to artist1 and artist2.
+""")
+def search(
+        limit: int = typer.Option(20, "-l", "--limit", help="Number of results to return."),
+
+        artists: str = typer.Option(None, "-a", "--artists", help="Results will be tracks by similar artists."),
+        genres: str = typer.Option(None, "-g", "--genres", help="Results will be in this genre."),
+        tracks: str = typer.Option(None, "-t", "--tracks", help="Results will be similar to these tracks."),
+
+        acousticness: str = typer.Option(None, "-ac", "--acousticness", help="0.0 to 1.0"),
+        danceability: str = typer.Option(None, "-da", "--danceability", help="0.0 to 1.0"),
+        duration_ms: str = typer.Option(None, "-du", "--duration_ms", help="0.0 or more"),
+        energy: str = typer.Option(None, "-e", "--energy", help="0.0 to 1.0"),
+        instrumentalness: str = typer.Option(None, "-i", "--instrumentalness", help="0.0 to 1.0"),
+        key: str = typer.Option(None, "-k", "--key", help="0 to 11"),
+        liveness: str = typer.Option(None, "-li", "--liveness", help="0.0 to 1.0"),
+        loudness: str = typer.Option(None, "-lo", "--loudness", help="−60.0 to 0.0"),
+        mode: str = typer.Option(None, "-m", "--mode", help="0 or 1"),
+        popularity: str = typer.Option(None, "-p", "--popularity", help="0 to 100"),
+        speechiness: str = typer.Option(None, "-s", "--speechiness", help="0.0 to 1.0"),
+        tempo: str = typer.Option(None, "-te", "--tempo", help="0.0 or more"),
+        time_signature: str = typer.Option(None, "-ts", "--time_signature", help="3 to 7"),
+        valence: str = typer.Option(None, "-v", "--valence", help="0.0 to 1.0"),
+):
+    seed_artists = artists_from_string(artists) if artists is not None else None
+    seed_genres = genres_from_string(genres) if genres is not None else None
+    seed_tracks = tracks_from_string(tracks) if tracks is not None else None
+
+    audio_features = set()
+    filters = {}
+    for audio_feature, value in locals().items():
+        if value is None or audio_feature not in AUDIO_FEATURES:
+            continue
+        conversion = AUDIO_FEATURES[audio_feature]
+        audio_features.add(audio_feature)
+        if "-" in value:  # Range provided
+            minimum, maximum = value.split("-")
+            if minimum:
+                filters[f"min_{audio_feature}"] = conversion(minimum)
+            if maximum:
+                filters[f"max_{audio_feature}"] = conversion(maximum)
+        else:  # Single value provided
+            filters[f"target_{audio_feature}"] = conversion(value)
+
+    results = spotify.recommendations(
+        seed_artists=seed_artists,
+        seed_genres=seed_genres,
+        seed_tracks=seed_tracks,
+        limit=limit,
+        **filters,
+    )
+
+    track_data = []
+    for track in results["tracks"]:
+        track_info = {
+            "Art": track["album"]["images"][0]["url"],
+            "Artist": track["artists"][0]["name"],
+            "Song": track["name"],
+        }
+        track_audio_features = spotify.audio_features(track["id"])[0]
+        for audio_feature in audio_features:
+            track_info[audio_feature] = track_audio_features[audio_feature]
+        track_data.append(track_info)
+
+    create_dataframe(track_data)
+
+
 if __name__ == "__main__":
     app()
