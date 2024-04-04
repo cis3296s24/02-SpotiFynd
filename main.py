@@ -1,3 +1,5 @@
+import json
+import os
 import spotipy
 import typer
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -45,8 +47,29 @@ def get_track_info_and_features(ids: list):
 def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                song: str = typer.Option(None, '-s', '--song'),
                pitch: str = typer.Option(None, '-p', '--pitch'),
-               tempo: str = typer.Option(None, '-t', '--tempo')):
-    
+               tempo: str = typer.Option(None, '-t', '--tempo'),
+               save: bool = None,
+               load: bool = None,
+):
+
+    if save is not None:
+        saved_filters = {}
+        if tempo is not None:
+            saved_filters["tempo"] = tempo
+        if pitch is not None:
+            saved_filters["pitch"] = pitch
+        with open("data.json", "w", encoding="utf-8") as file:
+            json.dump(saved_filters, file, ensure_ascii=False, indent=4)
+        return
+
+    if load is not None:
+        if not os.path.exists("data.json"):
+            raise ValueError("No saved filter. Create one with --save")
+        with open("data.json", "r") as file:
+            data = json.load(file)
+            pitch = data.get("pitch")
+            tempo = data.get("tempo")
+
     print("\t   _________              __  .__  _____                  .___")
     print("\t  /   _____/_____   _____/  |_|__|/ ____\__.__. ____    __| _/")
     print("\t  \_____  \\____ \ /  _ \   __\  \   __<   |  |/    \  / __ | ")
