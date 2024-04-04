@@ -52,6 +52,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                pitch: str = typer.Option(None, '-p', '--pitch'),
                tempo: str = typer.Option(None, '-t', '--tempo'),
                danceabillity: str = typer.Option(None, '-d', '--dance'),
+               help: str = typer.Option(None, '-h', '--help'),
                save: bool = None,
                load: bool = None,
 ):
@@ -82,77 +83,92 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
     print(r"   /_______  /   __/ \____/|__| |__||__|  / ____|___|  /\____ | ")
     print(r"           \/|__|                         \/         \/      \/ ")
     
-    #artist flag passed limited to 10 results
-    if artist:
-        search_type = "artist"
-        name = artist
-    #song flag passed limited by limit= in uri_from_search
-    elif song or tempo or pitch or danceabillity:
-        search_type = "track"
-        name = song
+    if artist is None:
+        
+        print("Welcome to SpotiFynd! Please input the artist, song, pitch, tempo, or dance property" + 
+          " interested in.\nFor example: $python main.py -a 'Drake'" +
+
+          "\n\nThe specific flags are:\n'-a' or 'artist' for artist" +
+          "\n'-s' or '--song' for song"   +
+          "\n'-p' or '--pitch' for pitch" +
+          "\n'-t' or '--tempo' for tempo" + 
+          "\n'-d' or '--dance' for dance" +
+          
+          "\n or '-h' or '--help' to display this message again\nHAVE FUN!")
+        
     else:
-        raise ValueError("You must provide either an artist (-a) or a song (-s).")
-    ids = uri_from_search(name, search_type)
-    track_data = []
-    
-    #corresponding to 0-11 value for -p search
-    pitch_names = ['C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B']
-    
-    #track search
-    if search_type == "track":
-        all_info = get_track_info_and_features(ids)
-        for track_info, features in all_info:
-            #pitch flag was passed
-            if pitch is not None and features["key"] == int(pitch):
-                track_info["Pitch"] = pitch_names[features["key"]]
-                track_data.append(track_info) #appends track info to track_data for df
-            #tempo flag was passed
-            if tempo is not None:
-                min_tempo, max_tempo = map(float, tempo.split('-'))
-                if min_tempo <= features["tempo"] <= max_tempo:
-                    track_info["Tempo"] = features["tempo"]
+        #artist flag passed limited to 10 results
+        if artist:
+            search_type = "artist"
+            name = artist
+        #song flag passed limited by limit= in uri_from_search
+        elif song or tempo or pitch or danceabillity:
+            search_type = "track"
+            name = song
+        else:
+            raise ValueError ("P.S. You must provide a flag")
+            
+        ids = uri_from_search(name, search_type)
+        track_data = []
+        
+        #corresponding to 0-11 value for -p search
+        pitch_names = ['C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B']
+        
+        #track search
+        if search_type == "track":
+            all_info = get_track_info_and_features(ids)
+            for track_info, features in all_info:
+                #pitch flag was passed
+                if pitch is not None and features["key"] == int(pitch):
+                    track_info["Pitch"] = pitch_names[features["key"]]
                     track_data.append(track_info) #appends track info to track_data for df
-            #danceability flag was passed
-            if danceabillity is not None:
-                min_dance, max_dance = map(float, danceabillity.split('-'))
-                if min_dance < 0.0 or max_dance > 1.0:
-                    raise ValueError(f"Danceability outside scope. Values must be between 0 and 1")
-                if min_dance <= features["danceability"] <= max_dance:
-                    track_info["Danceability"] = features["danceability"]
-                    track_data.append(track_info)
-            #no flags were passed
-            if pitch is None and tempo is None and danceabillity is None:
-                track_data.append(track_info)
-    #Artist search
-    else:
-        for id in ids:
-            results = spotify.artist_top_tracks(artist_id=id, country="US")
-            track_ids = [track["id"] for track in results["tracks"]]
-            if track_ids:
-                all_info = get_track_info_and_features(track_ids) #gets track info and features
-                #for all requested info
-                for track_info, features in all_info:
-                    #if pitch flag was passed
-                    if pitch is not None and features["key"] == int(pitch):
-                        track_info["Pitch"] = pitch_names[features["key"]]
+                #tempo flag was passed
+                if tempo is not None:
+                    min_tempo, max_tempo = map(float, tempo.split('-'))
+                    if min_tempo <= features["tempo"] <= max_tempo:
+                        track_info["Tempo"] = features["tempo"]
+                        track_data.append(track_info) #appends track info to track_data for df
+                #danceability flag was passed
+                if danceabillity is not None:
+                    min_dance, max_dance = map(float, danceabillity.split('-'))
+                    if min_dance < 0.0 or max_dance > 1.0:
+                        raise ValueError(f"Danceability outside scope. Values must be between 0 and 1")
+                    if min_dance <= features["danceability"] <= max_dance:
+                        track_info["Danceability"] = features["danceability"]
                         track_data.append(track_info)
-                    #if tempo flag was passed
-                    if tempo is not None:
-                        min_tempo, max_tempo = map(float, tempo.split('-')) #
-                        if min_tempo <= features["tempo"] <= max_tempo:
-                            track_info["Tempo"] = features["tempo"]
+                #no flags were passed
+                if pitch is None and tempo is None and danceabillity is None:
+                    track_data.append(track_info)
+        #Artist search
+        else:
+            for id in ids:
+                results = spotify.artist_top_tracks(artist_id=id, country="US")
+                track_ids = [track["id"] for track in results["tracks"]]
+                if track_ids:
+                    all_info = get_track_info_and_features(track_ids) #gets track info and features
+                    #for all requested info
+                    for track_info, features in all_info:
+                        #if pitch flag was passed
+                        if pitch is not None and features["key"] == int(pitch):
+                            track_info["Pitch"] = pitch_names[features["key"]]
                             track_data.append(track_info)
-                    #if danceability was passed
-                    if danceabillity is not None:
-                        min_dance, max_dance = map(float, danceabillity.split('-'))
-                        if min_dance < 0.0 or max_dance > 1.0:
-                            raise ValueError(f"Danceability outside scope. Values must be between 0 and 1")
-                        if min_dance <= features["danceability"] <= max_dance:
-                            track_info["Danceability"] = features["danceability"]
-                            track_data.append(track_info)
-                    #if no flags were passed
-                    else:
-                        track_data.append(track_info)       
-    df = create_dataframe(track_data)
+                        #if tempo flag was passed
+                        if tempo is not None:
+                            min_tempo, max_tempo = map(float, tempo.split('-')) #
+                            if min_tempo <= features["tempo"] <= max_tempo:
+                                track_info["Tempo"] = features["tempo"]
+                                track_data.append(track_info)
+                        #if danceability was passed
+                        if danceabillity is not None:
+                            min_dance, max_dance = map(float, danceabillity.split('-'))
+                            if min_dance < 0.0 or max_dance > 1.0:
+                                raise ValueError(f"Danceability outside scope. Values must be between 0 and 1")
+                            if min_dance <= features["danceability"] <= max_dance:
+                                track_info["Danceability"] = features["danceability"]
+                                track_data.append(track_info)
+                        #if no flags were passed
+                        else:
+                            track_data.append(track_info)       
+        df = create_dataframe(track_data)
 if __name__ == "__main__":
     app()
