@@ -5,6 +5,7 @@ import typer
 from spotipy.oauth2 import SpotifyClientCredentials
 from dataframe import create_dataframe
 from skip_auth import access_token
+from spotipy_fix import spotipy_fix
 
 # Doesn't allow personal features such as playlist access, 
 # but removes the need for username/password.
@@ -12,6 +13,8 @@ from skip_auth import access_token
 spotify = spotipy.Spotify(auth=access_token())
 
 #spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
+
+spotipy_fix(spotify)
 app = typer.Typer()
 
 
