@@ -9,9 +9,9 @@ from skip_auth import access_token
 # Doesn't allow personal features such as playlist access, 
 # but removes the need for username/password.
 # Could be a launch option in the future?
-#spotify = spotipy.Spotify(auth=access_token()) 
+spotify = spotipy.Spotify(auth=access_token())
 
-spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id="0e4b89bd47944da690d39e5665b146cc", client_secret="aea56900dd914ebda88809a946993697"))
+#spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 app = typer.Typer()
 
 
@@ -48,10 +48,10 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                song: str = typer.Option(None, '-s', '--song'),
                pitch: str = typer.Option(None, '-p', '--pitch'),
                tempo: str = typer.Option(None, '-t', '--tempo'),
-               danceabillity: str = typer.Option(None, '-d', '--dance')):
-    
+               danceabillity: str = typer.Option(None, '-d', '--dance'),
                save: bool = None,
-               load: bool = None,):
+               load: bool = None,
+):
 
     if save is not None:
         saved_filters = {}
@@ -71,7 +71,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
             pitch = data.get("pitch")
             tempo = data.get("tempo")
 
-            
+
     print("\t   _________              __  .__  _____                  .___")
     print("\t  /   _____/_____   _____/  |_|__|/ ____\__.__. ____    __| _/")
     print("\t  \_____  \\____ \ /  _ \   __\  \   __<   |  |/    \  / __ | ")
