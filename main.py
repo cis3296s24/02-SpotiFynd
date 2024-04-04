@@ -9,9 +9,9 @@ from skip_auth import access_token
 # Doesn't allow personal features such as playlist access, 
 # but removes the need for username/password.
 # Could be a launch option in the future?
-spotify = spotipy.Spotify(auth=skip_auth.access_token()) 
+#spotify = spotipy.Spotify(auth=access_token()) 
 
-#spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
+spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id="0e4b89bd47944da690d39e5665b146cc", client_secret="aea56900dd914ebda88809a946993697"))
 app = typer.Typer()
 
 
@@ -48,9 +48,10 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                song: str = typer.Option(None, '-s', '--song'),
                pitch: str = typer.Option(None, '-p', '--pitch'),
                tempo: str = typer.Option(None, '-t', '--tempo'),
+               danceabillity: str = typer.Option(None, '-d', '--dance')):
+    
                save: bool = None,
-               load: bool = None,
-):
+               load: bool = None,):
 
     if save is not None:
         saved_filters = {}
@@ -70,6 +71,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
             pitch = data.get("pitch")
             tempo = data.get("tempo")
 
+            
     print("\t   _________              __  .__  _____                  .___")
     print("\t  /   _____/_____   _____/  |_|__|/ ____\__.__. ____    __| _/")
     print("\t  \_____  \\____ \ /  _ \   __\  \   __<   |  |/    \  / __ | ")
@@ -82,7 +84,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
         search_type = "artist"
         name = artist
     #song flag passed limited by limit= in uri_from_search
-    elif song or tempo or pitch:
+    elif song or tempo or pitch or danceabillity:
         search_type = "track"
         name = song
     else:
@@ -107,8 +109,16 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                 if min_tempo <= features["tempo"] <= max_tempo:
                     track_info["Tempo"] = features["tempo"]
                     track_data.append(track_info) #appends track info to track_data for df
+            #danceability flag was passed
+            if danceabillity is not None:
+                min_dance, max_dance = map(float, danceabillity.split('-'))
+                if min_dance < 0.0 or max_dance > 1.0:
+                    raise ValueError(f"Danceability outside scope. Values must be between 0 and 1")
+                if min_dance <= features["danceability"] <= max_dance:
+                    track_info["Danceability"] = features["danceability"]
+                    track_data.append(track_info)
             #no flags were passed
-            if pitch is None and tempo is None:
+            if pitch is None and tempo is None and danceabillity is None:
                 track_data.append(track_info)
     #Artist search
     else:
@@ -128,6 +138,14 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                         min_tempo, max_tempo = map(float, tempo.split('-')) #
                         if min_tempo <= features["tempo"] <= max_tempo:
                             track_info["Tempo"] = features["tempo"]
+                            track_data.append(track_info)
+                    #if danceability was passed
+                    if danceabillity is not None:
+                        min_dance, max_dance = map(float, danceabillity.split('-'))
+                        if min_dance < 0.0 or max_dance > 1.0:
+                            raise ValueError(f"Danceability outside scope. Values must be between 0 and 1")
+                        if min_dance <= features["danceability"] <= max_dance:
+                            track_info["Danceability"] = features["danceability"]
                             track_data.append(track_info)
                     #if no flags were passed
                     else:
