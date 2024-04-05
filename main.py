@@ -1,10 +1,9 @@
-import json
-import os
 import typer
 from spotipy.oauth2 import SpotifyClientCredentials
 from dataframe import create_dataframe
 from filter_features import filter_pitch, filter_tempo, filter_danceability
 from track_info import get_track_info_and_features, spotify
+from save_load import save_filters, load_filters
 
 
 #spotify = spotipy.Spotify(auth_manager=SpotifyClientCredentials())
@@ -32,14 +31,39 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                pitch: str = typer.Option(None, '-p', '--pitch'),
                tempo: str = typer.Option(None, '-t', '--tempo'),
                danceabillity: str = typer.Option(None, '-d', '--dance'),
+               help: str = typer.Option(None, '-h', '--help'),
+               save: bool = None,
+               load: bool = None,
 ):
 
+    
+    if save is not None:
+        save_filters(tempo, pitch)
+        return
+
+    if load is not None:
+        pitch, tempo = load_filters()
+    
     print("\t   _________              __  .__  _____                  .___")
     print("\t  /   _____/_____   _____/  |_|__|/ ____\__.__. ____    __| _/")
     print("\t  \_____  \\____ \ /  _ \   __\  \   __<   |  |/    \  / __ | ")
     print("\t  /        \  |_> >  <_> )  | |  ||  |  \___  |   |  \/ /_/ | ")
     print("\t /_______  /   __/ \____/|__| |__||__|  / ____|___|  /\____ | ")
     print("\t         \/|__|                         \/         \/      \/ ")
+    
+    
+    if artist is None and song is None:
+        
+        print("Welcome to SpotiFynd! Please input the artist, song, pitch, tempo, or dance property" + 
+          " you are interested in.\nFor example: $python main.py -a 'Drake'" +
+
+          "\n\nThe specific flags are:\n'-a' or 'artist' for artist" +
+          "\n'-s' or '--song' for song"   +
+          "\n'-p' or '--pitch' for pitch" +
+          "\n'-t' or '--tempo' for tempo" + 
+          "\n'-d' or '--dance' for dance" +
+          
+          "\n or '-h' or '--help' to display this message again\nHAVE FUN!")
     
     #Used to filter the search results
     flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceabillity": danceabillity}
