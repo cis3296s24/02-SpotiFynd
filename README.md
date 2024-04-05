@@ -48,6 +48,8 @@ pip install -r requirements.txt
 ## Running the Application
 To run the application, use the following command:
 ```
+python main.py
+```
 python main.py -a "artist name"
 ```
 python main.py -a "artist name" -d "0.3-0.6"
