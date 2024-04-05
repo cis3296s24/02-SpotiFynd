@@ -1,19 +1,15 @@
 import json
 import os
-import spotipy
 import typer
 from spotipy.oauth2 import SpotifyClientCredentials
 from dataframe import create_dataframe
-import skip_auth
+from filter_features import filter_pitch, filter_tempo, filter_danceability
+from track_info import get_track_info_and_features, spotify
 
-# Doesn't allow personal features such as playlist access, 
-# but removes the need for username/password.
-# Could be a launch option in the future?
-spotify = spotipy.Spotify(auth=skip_auth.access_token()) 
 
+#spotify = spotipy.Spotify(auth_manager=SpotifyClientCredentials())
 #spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 app = typer.Typer()
-
 
 def uri_from_search(name: str, search_type: str):
     #limit determines amount of results, artist and album are limited to 10 results via API
@@ -26,51 +22,8 @@ def uri_from_search(name: str, search_type: str):
     else:
         raise ValueError(f"No {search_type}s found with the name {name}")
 
-#Retrieves track information and features from the Spotify API
-def get_track_info_and_features(ids: list):
-    results = spotify.tracks(ids) #for artist, song, album
-    features = spotify.audio_features(ids) #for tempo, pitch, etc
-    all_info = [] #list of both track info and features
-
-    for i, track in enumerate(results["tracks"]):
-        track_info = {
-            "Art": track["album"]["images"][0]["url"],
-            "Artist": track["artists"][0]["name"], 
-            "Song": track["name"],
-        }
-        all_info.append((track_info, features[i])) #appends track info and features to all_info
-
-    return all_info
-
-#For filtering pitch
-#corresponding to 0-11 value for -p search
-pitch_names = ['C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B']
-
-def filter_pitch(track_info, features, pitch):
-    if features["key"] == int(pitch):
-        track_info["Pitch"] = pitch_names[features["key"]]
-    return track_info
-
-#For filtering tempo
-def filter_tempo(track_info, features, tempo):
-    min_tempo, max_tempo = map(float, tempo.split('-'))
-    if min_tempo <= features["tempo"] <= max_tempo:
-        track_info["Tempo"] = features["tempo"]
-    return track_info
-
-#For filtering danceability
-def filter_danceability(track_info, features, danceabillity):
-    min_dance, max_dance = map(float, danceabillity.split('-'))
-    #checks that the danceability is within the scope of 0-1
-    if min_dance < 0.0 or max_dance > 1.0:
-        raise ValueError(f"Danceability outside scope. Values must be between 0 and 1")
-    if min_dance <= features["danceability"] <= max_dance:
-        track_info["Danceability"] = features["danceability"]
-    return track_info
-
 #Dictionary of filter handlers for filtering in top_tracks, this is used when filtering a song by feature
 filter_handlers = {"pitch": filter_pitch, "tempo": filter_tempo, "danceabillity": filter_danceability}
-
 
 @app.command()
 #top_tracks passed arguments based on flags such as -a or -s
@@ -79,7 +32,6 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                pitch: str = typer.Option(None, '-p', '--pitch'),
                tempo: str = typer.Option(None, '-t', '--tempo'),
                danceabillity: str = typer.Option(None, '-d', '--dance'),
-               help: str = typer.Option(None, '-h', '--help'),
 ):
 
     print("\t   _________              __  .__  _____                  .___")
@@ -132,5 +84,6 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                         if flags[flag] is not None:
                             track_data[-1] = handler(track_info, features, flags[flag])       
     df = create_dataframe(track_data)
+
 if __name__ == "__main__":
     app()
