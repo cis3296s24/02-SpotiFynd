@@ -86,7 +86,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
     if artist is None:
         
         print("Welcome to SpotiFynd! Please input the artist, song, pitch, tempo, or dance property" + 
-          " interested in.\nFor example: $python main.py -a 'Drake'" +
+          " you are interested in.\nFor example: $python main.py -a 'Drake'" +
 
           "\n\nThe specific flags are:\n'-a' or 'artist' for artist" +
           "\n'-s' or '--song' for song"   +

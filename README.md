@@ -27,21 +27,11 @@ python -m venv venv
   ```
 5. Install the required dependencies:
 ```
-pip install spotipy typer
+pip install -r requirements.txt
 ```
 
 ## Configuration
-Before running the application, you need to set up your Spotify API credentials. Set your Client ID and Client Secret as environment variables:
-- On Windows:
-```
-set SPOTIPY_CLIENT_ID=your_client_id_here
-set SPOTIPY_CLIENT_SECRET=your_client_secret_here
-```
-- On macOS and Linux:
-```
-export SPOTIPY_CLIENT_ID=your_client_id_here
-export SPOTIPY_CLIENT_SECRET=your_client_secret_here
-```
+
 *** To get a client ID and client secret, you must sign up for Spotipy's web API. Follow below instructions to do so. ***
 1. Browse to https://developer.spotify.com/dashboard/applications.
 
@@ -58,9 +48,10 @@ export SPOTIPY_CLIENT_SECRET=your_client_secret_here
 ## Running the Application
 To run the application, use the following command:
 ```
-python main.py "artist name"
+python main.py -a "artist name"
 ```
-
+python main.py -a "artist name" -d "0.3-0.6"
+```
 
 # Authors
 - Gabriel Carvalho
