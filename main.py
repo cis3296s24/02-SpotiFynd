@@ -5,9 +5,10 @@ from filter_features import filter_pitch, filter_tempo, filter_danceability
 from track_info import get_track_info_and_features, spotify
 from save_load import save_filters, load_filters
 
-
 #spotify = spotipy.Spotify(auth_manager=SpotifyClientCredentials())
 #spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
+
+spotipy_fix(spotify) #may need to resolve with track_info
 app = typer.Typer()
 
 def uri_from_search(name: str, search_type: str):
@@ -35,7 +36,6 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                save: bool = None,
                load: bool = None,
 ):
-
     
     if save is not None:
         save_filters(tempo, pitch)
@@ -63,7 +63,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
           "\n'-t' or '--tempo' for tempo" + 
           "\n'-d' or '--dance' for dance" +
           
-          "\n or '-h' or '--help' to display this message again\nHAVE FUN!")
+          "\n or '-h' or '--help' to display this message again\nHAVE FUN!")  
     
     #Used to filter the search results
     flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceabillity": danceabillity}
@@ -108,6 +108,5 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                         if flags[flag] is not None:
                             track_data[-1] = handler(track_info, features, flags[flag])       
     df = create_dataframe(track_data)
-
 if __name__ == "__main__":
     app()
