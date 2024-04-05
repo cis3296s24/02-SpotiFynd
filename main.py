@@ -42,23 +42,34 @@ def get_track_info_and_features(ids: list):
 
     return all_info
 
-#Used to filter pitch
+#For filtering pitch
 #corresponding to 0-11 value for -p search
 pitch_names = ['C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B']
+
 def filter_pitch(track_info, features, pitch):
     if features["key"] == int(pitch):
         track_info["Pitch"] = pitch_names[features["key"]]
     return track_info
 
-#Used to filter tempo
+#For filtering tempo
 def filter_tempo(track_info, features, tempo):
     min_tempo, max_tempo = map(float, tempo.split('-'))
     if min_tempo <= features["tempo"] <= max_tempo:
         track_info["Tempo"] = features["tempo"]
     return track_info
 
+#For filtering danceability
+def filter_danceability(track_info, features, danceabillity):
+    min_dance, max_dance = map(float, danceabillity.split('-'))
+    #checks that the danceability is within the scope of 0-1
+    if min_dance < 0.0 or max_dance > 1.0:
+        raise ValueError(f"Danceability outside scope. Values must be between 0 and 1")
+    if min_dance <= features["danceability"] <= max_dance:
+        track_info["Danceability"] = features["danceability"]
+    return track_info
+
 #Dictionary of filter handlers for filtering in top_tracks, this is used when filtering a song by feature
-filter_handlers = {"pitch": filter_pitch, "tempo": filter_tempo}
+filter_handlers = {"pitch": filter_pitch, "tempo": filter_tempo, "danceabillity": filter_danceability}
 
 
 @app.command()
@@ -67,6 +78,8 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                song: str = typer.Option(None, '-s', '--song'),
                pitch: str = typer.Option(None, '-p', '--pitch'),
                tempo: str = typer.Option(None, '-t', '--tempo'),
+               danceabillity: str = typer.Option(None, '-d', '--dance'),
+               help: str = typer.Option(None, '-h', '--help'),
 ):
 
     print("\t   _________              __  .__  _____                  .___")
@@ -77,14 +90,14 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
     print("\t         \/|__|                         \/         \/      \/ ")
     
     #Used to filter the search results
-    flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo}
+    flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceabillity": danceabillity}
     
     #artist flag passed limited to 10 results
     if artist:
         search_type = "artist"
         name = artist
     #song flag passed limited by limit= in uri_from_search
-    elif song or tempo or pitch:
+    elif song or tempo or pitch or danceabillity:
         search_type = "track"
         name = song
     else:
