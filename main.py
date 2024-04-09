@@ -8,7 +8,7 @@ from save_load import save_filters, load_filters
 #spotify = spotipy.Spotify(auth_manager=SpotifyClientCredentials())
 #spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 
-spotipy_fix(spotify) #may need to resolve with track_info
+#spotipy_fix(spotify) #may need to resolve with track_info
 app = typer.Typer()
 
 def uri_from_search(name: str, search_type: str):
@@ -44,12 +44,12 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
     if load is not None:
         pitch, tempo = load_filters()
     
-    print("\t   _________              __  .__  _____                  .___")
-    print("\t  /   _____/_____   _____/  |_|__|/ ____\__.__. ____    __| _/")
-    print("\t  \_____  \\____ \ /  _ \   __\  \   __<   |  |/    \  / __ | ")
-    print("\t  /        \  |_> >  <_> )  | |  ||  |  \___  |   |  \/ /_/ | ")
-    print("\t /_______  /   __/ \____/|__| |__||__|  / ____|___|  /\____ | ")
-    print("\t         \/|__|                         \/         \/      \/ ")
+    print(r"     _________              __  .__  _____                  .___")
+    print(r"    /   _____/_____   _____/  |_|__|/ ____\__.__. ____    __| _/")
+    print(r"    \_____  \\____ \ /  _ \   __\  \   __<   |  |/    \  / __ | ")
+    print(r"    /        \  |_> >  <_> )  | |  ||  |  \___  |   |  \/ /_/ | ")
+    print(r"   /_______  /   __/ \____/|__| |__||__|  / ____|___|  /\____ | ")
+    print(r"           \/|__|                         \/         \/      \/ ")
     
     
     if artist is None and song is None:
