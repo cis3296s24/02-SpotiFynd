@@ -8,7 +8,7 @@ from save_load import save_filters, load_filters
 #spotify = spotipy.Spotify(auth_manager=SpotifyClientCredentials())
 #spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 
-spotipy_fix(spotify) #may need to resolve with track_info
+#spotipy_fix(spotify) #may need to resolve with track_info
 app = typer.Typer()
 
 def uri_from_search(name: str, search_type: str):
