@@ -25,3 +25,13 @@ def filter_danceability(track_info, features, danceabillity):
     if min_dance <= features["danceability"] <= max_dance:
         track_info["Danceability"] = features["danceability"]
     return track_info
+
+#For filtering acousticness
+def filter_acousticness(track_info, features, acousticness):
+    min_acoust, max_acoust = map(float, acousticness.split('-'))
+    #Check to make sure acousticness is given within range 0-1
+    if min_acoust < 0.0 or max_acoust > 1.0:
+        raise ValueError(f"Acousticness outside scope. Values must be between 0.0 and 1. Ex: 0.3-0.7")
+    if min_acoust <= features["acousticness"] <= max_acoust:
+        track_info["Acousticness"] = features["acousticness"]
+    return track_info
