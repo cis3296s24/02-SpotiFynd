@@ -3,21 +3,21 @@ from spotipy.oauth2 import SpotifyOAuth
 import pandas as pd
 
 class Credentials():
-    def __init__(self, client_id, client_secret, username):
+    def __init__(self):
+        client_id = input("Provide Client ID: ")
+        client_secret = input("Provide Client SECRET: ")
+        username = input("Provide Username: ")
+
         self.client_id = client_id
         self.client_secret = client_secret
         self.username = username
         self.redirect_uri = "http://localhost:5000"
-        self.scope = "playlist-modify-private playlist-modify-public"
+        self.scope = ""
 
+cred = Credentials()
 
 def create_playlist(name:str = "test-playlist", is_public:bool = True)->str:
-    #Remove later after testing
-    client_id = "0e4b89bd47944da690d39e5665b146cc"
-    client_secret = "aea56900dd914ebda88809a946993697"
-    username = "Gabriel Lopes Carvalho"
-    cred = Credentials(client_id, client_secret, username)
-    
+    cred.scope = "playlist-modify-private playlist-modify-public"
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
             client_id=cred.client_id,
             client_secret=cred.client_secret,
@@ -29,12 +29,6 @@ def create_playlist(name:str = "test-playlist", is_public:bool = True)->str:
     return sp.user_playlist_create(user=sp.current_user()["id"], name=name, public=is_public)["id"]
 
 def get_playlists_info()->pd.DataFrame:
-    #Remove later after testing
-    client_id = "0e4b89bd47944da690d39e5665b146cc"
-    client_secret = "aea56900dd914ebda88809a946993697"
-    username = "Gabriel Lopes Carvalho"
-
-    cred = Credentials(client_id, client_secret, username)
     cred.scope = "user-top-read"
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
             client_id=cred.client_id,
@@ -66,11 +60,7 @@ def get_playlists_info()->pd.DataFrame:
 
 def add_to_playlist(playlist_id:str, song_uri:list, position:int = 0)->int:
     #Remove later after testing
-    client_id = "0e4b89bd47944da690d39e5665b146cc"
-    client_secret = "aea56900dd914ebda88809a946993697"
-    username = "Gabriel Lopes Carvalho"
-    cred = Credentials(client_id, client_secret, username)
-    
+    cred.scope = "playlist-modify-private playlist-modify-public"
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
             client_id=cred.client_id,
             client_secret=cred.client_secret,
@@ -81,11 +71,10 @@ def add_to_playlist(playlist_id:str, song_uri:list, position:int = 0)->int:
     )
 
     sp.playlist_add_items(playlist_id=playlist_id, items=song_uri, position=position)
-
-
+    return 0
 
 if __name__ == "__main__":
-    new_playlist = create_playlist("Software Design Shits 2")
+    new_playlist = create_playlist("Software Design Shits 4")
     print(get_playlists_info().head(10))
     songs = ["spotify:track:3vkQ5DAB1qQMYO4Mr9zJN6",
              "spotify:track:2245x0g1ft0HC7sf79zbYN",
