@@ -1,9 +1,12 @@
 import typer
+import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 from dataframe import create_dataframe
 from filter_features import filter_pitch, filter_tempo, filter_danceability, filter_acousticness, filter_time_signature
 from track_info import get_track_info_and_features, spotify
 from save_load import save_filters, load_filters
+from user_tracks import generate_user_tracks
+
 
 #spotify = spotipy.Spotify(auth_manager=SpotifyClientCredentials())
 #spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
@@ -34,6 +37,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                danceabillity: str = typer.Option(None, '-d', '--dance'),
                time_signature: str = typer.Option(None, '-ts', '--time_signature'),
                acousticness: str = typer.Option(None,'-ac', '--acoustic'),
+               user_tracks: bool = typer.Option(None, '-z', '--song_suggestions'),
                help: str = typer.Option(None, '-h', '--help'),
                save: bool = None,
                load: bool = None,
@@ -45,6 +49,10 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
 
     if load is not None:
         pitch, tempo = load_filters()
+        
+    if user_tracks is not None:
+        generate_user_tracks()
+        return
     
     print(r"     _________              __  .__  _____                  .___")
     print(r"    /   _____/_____   _____/  |_|__|/ ____\__.__. ____    __| _/")
