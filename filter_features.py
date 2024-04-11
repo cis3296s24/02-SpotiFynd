@@ -31,15 +31,6 @@ def filter_danceability(track_info, features, danceabillity):
         track_info["Danceability"] = features["danceability"]
     return track_info
 
-
-#For filtering time signature enter a value between 3 and 7 representing that number/4 ex: "3" -> 3/4 time
-def filter_time_signature(track_info, features, time_signature):
-    if int(time_signature) < 3 or int(time_signature) > 7:
-        raise ValueError(f"Time Signature outside scope. Values must be between 3 and 7")
-    if features["time_signature"] == int(time_signature):
-        track_info["Time Signature"] = features["time_signature"]
-    return track_info
-        
 #For filtering acousticness
 def filter_acousticness(track_info, features, acousticness):
     min_acoust, max_acoust = map(float, acousticness.split('-'))
@@ -48,4 +39,12 @@ def filter_acousticness(track_info, features, acousticness):
         raise ValueError(f"Acousticness outside scope. Values must be between 0.0 and 1. Ex: 0.3-0.7")
     if min_acoust <= features["acousticness"] <= max_acoust:
         track_info["Acousticness"] = features["acousticness"]
+    return track_info
+
+#For filtering time signature enter a value between 3 and 7 representing that number/4 ex: "3" -> 3/4 time
+def filter_time_signature(track_info, features, time_signature):
+    if int(time_signature) < 3 or int(time_signature) > 7:
+        raise ValueError(f"Time Signature outside scope. Values must be between 3 and 7")
+    if features["time_signature"] == int(time_signature):
+        track_info["Time Signature"] = features["time_signature"]
     return track_info

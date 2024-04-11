@@ -60,14 +60,6 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
           " you are interested in.\nFor example: $python main.py -a 'Drake' -t '120-180' -d '0.2-0.7' -ac '0.4-0.9'" +
 
           "\n\nThe specific flags are:\n'-a' or 'artist' for artist" +
-          "\n'-s' or '--song' for song"   +
-          "\n'-p' or '--pitch' for pitch" +
-          "\n'-t' or '--tempo' for tempo" + 
-          "\n'-d' or '--dance' for dance" + 
-          "\n or '-h' or '--help' to display this message again\nHAVE FUN!")  
-    
-    #Used to filter the search results
-    flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceabillity": danceabillity, "time_signature": time_signature}
           "\n\nThe specific flags are: "+
           "\n'-a'  or 'artist'   for artist" +
           "\n'-s'  or '--song'   for song"   +
@@ -77,10 +69,10 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
           "\n'-ac' or '--acoust' for acoustic" +
           "\n'-ts' or '--time_signature' for time signature" +
           "\n'-h'  or '--help'   for help" +   
-          "\nHAVE FUN!")  
+          "\nHAVE FUN!")   
     
     #Used to filter the search results
-    flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceabillity": danceabillity, "acousticness": acousticness}
+    flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceabillity": danceabillity, "acousticness": acousticness, "time_signature": time_signature}
     
     #artist flag passed limited to 10 results
     if artist:
