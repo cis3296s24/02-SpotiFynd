@@ -59,7 +59,8 @@ def get_playlists_info()->pd.DataFrame:
     # Create the final df   
     df = pd.DataFrame({ "playlist_name": playlist_name, 
                                 "playlist_id": playlist_id, 
-                                "playlist_public": playlist_public,})
+                                "playlist_public": playlist_public,
+                                "playlist_tracks":playlist_tracks})
 
     return df
 
