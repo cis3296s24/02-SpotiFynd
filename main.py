@@ -23,7 +23,7 @@ def uri_from_search(name: str, search_type: str):
         raise ValueError(f"No {search_type}s found with the name {name}")
 
 #Dictionary of filter handlers for filtering in top_tracks, this is used when filtering a song by feature
-filter_handlers = {"pitch": filter_pitch, "tempo": filter_tempo, "danceabillity": filter_danceability,"acousticness": filter_acousticness, "time_signature": filter_time_signature}
+filter_handlers = {"pitch": filter_pitch, "tempo": filter_tempo, "danceability": filter_danceability,"acousticness": filter_acousticness, "time_signature": filter_time_signature}
 
 @app.command()
 #top_tracks passed arguments based on flags such as -a or -s
@@ -31,20 +31,19 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                song: str = typer.Option(None, '-s', '--song'),
                pitch: str = typer.Option(None, '-p', '--pitch'),
                tempo: str = typer.Option(None, '-t', '--tempo'),
-               danceabillity: str = typer.Option(None, '-d', '--dance'),
+               danceability: str = typer.Option(None, '-d', '--dance'),
                time_signature: str = typer.Option(None, '-ts', '--time_signature'),
-               acousticness: str = typer.Option(None,'-ac', '--acoustic'),
+               acousticness: str = typer.Option(None, '-ac', '--acoustic'),
                help: str = typer.Option(None, '-h', '--help'),
                save: bool = None,
                load: bool = None,
-):
+               ):
     
     if save is not None:
-        save_filters(tempo, pitch)
-        return
+        save_filters(pitch, tempo, danceability, time_signature, acousticness)
 
     if load is not None:
-        pitch, tempo = load_filters()
+        pitch, tempo, danceability, time_signature, acousticness = load_filters()
     
     print(r"     _________              __  .__  _____                  .___")
     print(r"    /   _____/_____   _____/  |_|__|/ ____\__.__. ____    __| _/")
@@ -72,7 +71,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
           "\nHAVE FUN!")   
     
     #Used to filter the search results
-    flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceabillity": danceabillity, "acousticness": acousticness, "time_signature": time_signature}
+    flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceability": danceability, "acousticness": acousticness, "time_signature": time_signature}
     
     #artist flag passed limited to 10 results
     if artist:
@@ -80,7 +79,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
         name = artist
     #song flag passed limited by limit= in uri_from_search
 
-    elif song or tempo or pitch or danceabillity or acousticness or time_signature:
+    elif song or tempo or pitch or danceability or acousticness or time_signature:
         search_type = "track"
         name = song
     else:
