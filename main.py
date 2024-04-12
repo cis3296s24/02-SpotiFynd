@@ -1,7 +1,7 @@
 import typer
 from spotipy.oauth2 import SpotifyClientCredentials
 from dataframe import create_dataframe
-from filter_features import filter_pitch, filter_tempo, filter_danceability, filter_acousticness, filter_time_signature
+from filter_features import filter_pitch, filter_tempo, filter_danceability, filter_acousticness, filter_time_signature, filter_liveness
 from track_info import get_track_info_and_features, spotify
 from save_load import save_filters, load_filters
 
@@ -23,7 +23,8 @@ def uri_from_search(name: str, search_type: str):
         raise ValueError(f"No {search_type}s found with the name {name}")
 
 #Dictionary of filter handlers for filtering in top_tracks, this is used when filtering a song by feature
-filter_handlers = {"pitch": filter_pitch, "tempo": filter_tempo, "danceability": filter_danceability,"acousticness": filter_acousticness, "time_signature": filter_time_signature}
+
+filter_handlers = {"pitch": filter_pitch, "tempo": filter_tempo, "danceabillity": filter_danceability,"acousticness": filter_acousticness, "time_signature": filter_time_signature, "liveness": filter_liveness}
 
 @app.command()
 #top_tracks passed arguments based on flags such as -a or -s
@@ -33,7 +34,10 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                tempo: str = typer.Option(None, '-t', '--tempo'),
                danceability: str = typer.Option(None, '-d', '--dance'),
                time_signature: str = typer.Option(None, '-ts', '--time_signature'),
-               acousticness: str = typer.Option(None, '-ac', '--acoustic'),
+
+               acousticness: str = typer.Option(None,'-ac', '--acoustic'),
+               liveness: str = typer.Option(None, '-l', '--liveness'),
+
                help: str = typer.Option(None, '-h', '--help'),
                save: bool = None,
                load: bool = None,
@@ -67,52 +71,58 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
           "\n'-d'  or '--dance'  for dance" +
           "\n'-ac' or '--acoust' for acoustic" +
           "\n'-ts' or '--time_signature' for time signature" +
+          "\n'-l'  or '--liveness' for liveness" +
           "\n'-h'  or '--help'   for help" +   
-          "\nHAVE FUN!")   
-    
-    #Used to filter the search results
-    flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceability": danceability, "acousticness": acousticness, "time_signature": time_signature}
-    
-    #artist flag passed limited to 10 results
-    if artist:
-        search_type = "artist"
-        name = artist
-    #song flag passed limited by limit= in uri_from_search
 
-    elif song or tempo or pitch or danceability or acousticness or time_signature:
-        search_type = "track"
-        name = song
+          "\nHAVE FUN!")
+        
+
     else:
-        raise ValueError("You must provide either an artist (-a) or a song (-s).")
-    ids = uri_from_search(name, search_type)
-    track_data = []
-    
-    #track search
-    if search_type == "track":
-        all_info = get_track_info_and_features(ids)
-        for track_info, features in all_info:
-            #Always append track_info to track_data
-            track_data.append(track_info)
-            #Apply filters, filter_handlers is a dictionary of filter functions that calls on the filtering functions
-            for flag, handler in filter_handlers.items(): 
-                if flags[flag] is not None:
-                    #Update the last element of track_data with the filtered track_info
-                    track_data[-1] = handler(track_info, features, flags[flag])
-    #Artist search
-    else:
-        for id in ids:
-            results = spotify.artist_top_tracks(artist_id=id, country="US")
-            track_ids = [track["id"] for track in results["tracks"]]
-            if track_ids:
-                all_info = get_track_info_and_features(track_ids) #gets track info and features
-                #for all requested info
-                for track_info, features in all_info:
-                    #Operation is always done
-                    track_data.append(track_info)
-                    #Apply filters
-                    for flag, handler in filter_handlers.items():
-                        if flags[flag] is not None:
-                            track_data[-1] = handler(track_info, features, flags[flag])       
-    df = create_dataframe(track_data)
+        
+        #Used to filter the search results
+        flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceabillity": danceabillity, "acousticness": acousticness, "time_signature": time_signature, "liveness": liveness}
+        
+        #artist flag passed limited to 10 results
+        if artist:
+            search_type = "artist"
+            name = artist
+        #song flag passed limited by limit= in uri_from_search
+
+        elif song or tempo or pitch or danceabillity or acousticness or time_signature:
+            search_type = "track"
+            name = song
+        else:
+            raise ValueError("You must provide either an artist (-a) or a song (-s).")
+        ids = uri_from_search(name, search_type)
+        track_data = []
+        
+        #track search
+        if search_type == "track":
+            all_info = get_track_info_and_features(ids)
+            for track_info, features in all_info:
+                #Always append track_info to track_data
+                track_data.append(track_info)
+                #Apply filters, filter_handlers is a dictionary of filter functions that calls on the filtering functions
+                for flag, handler in filter_handlers.items(): 
+                    if flags[flag] is not None:
+                        #Update the last element of track_data with the filtered track_info
+                        track_data[-1] = handler(track_info, features, flags[flag])
+        #Artist search
+        else:
+            for id in ids:
+                results = spotify.artist_top_tracks(artist_id=id, country="US")
+                track_ids = [track["id"] for track in results["tracks"]]
+                if track_ids:
+                    all_info = get_track_info_and_features(track_ids) #gets track info and features
+                    #for all requested info
+                    for track_info, features in all_info:
+                        #Operation is always done
+                        track_data.append(track_info)
+                        #Apply filters
+                        for flag, handler in filter_handlers.items():
+                            if flags[flag] is not None:
+                                track_data[-1] = handler(track_info, features, flags[flag])       
+        df = create_dataframe(track_data)
+
 if __name__ == "__main__":
     app()
