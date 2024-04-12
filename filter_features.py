@@ -49,7 +49,7 @@ def filter_time_signature(track_info, features, time_signature):
         track_info["Time Signature"] = features["time_signature"]
     return track_info
 
-#For filtering loudness
+#For filtering liveness
 def filter_liveness(track_info, features, liveness):
     min_live, max_live = map(float, liveness.split('-'))
     #Check to make sure liveness is given within range 0-1
