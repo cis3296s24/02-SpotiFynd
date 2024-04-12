@@ -211,9 +211,9 @@ For example, -a "artist1, artist2" will return tracks by artists similar to arti
 def search(
         limit: int = typer.Option(20, "-l", "--limit", help="Number of results to return."),
 
-        artists: str = typer.Option(None, "-a", "--artists", help="Results will be tracks by similar artists."),
-        genres: str = typer.Option(None, "-g", "--genres", help="Results will be in this genre."),
-        tracks: str = typer.Option(None, "-t", "--tracks", help="Results will be similar to these tracks."),
+        artists: str = typer.Option(None, "-a", "--artists", help="Results will be tracks by similar artists.", parser=artists_from_string),
+        genres: str = typer.Option(None, "-g", "--genres", help="Results will be in this genre.", parser=genres_from_string),
+        tracks: str = typer.Option(None, "-t", "--tracks", help="Results will be similar to these tracks.", parser=tracks_from_string),
 
         acousticness=feature("acousticness", 0.0, 1.0),
         danceability=feature("danceability", 0.0, 1.0),
@@ -230,11 +230,8 @@ def search(
         time_signature=feature("time_signature", 3, 7),
         valence=feature("valence", 0.0, 1.0),
 ):
-    seed_artists = artists_from_string(artists) if artists is not None else None
-    seed_genres = genres_from_string(genres) if genres is not None else None
-    seed_tracks = tracks_from_string(tracks) if tracks is not None else None
 
-    non_features = {"limit", "artists", "genres", "tracks", "seed_artists", "seed_genres", "seed_tracks", "filters", "non_features"}
+    non_features = {"limit", "artists", "genres", "tracks", "filters", "non_features"}
     audio_features = {k: v for k, v in locals().items() if k not in non_features and v is not None}
     filters = {}
 
@@ -253,9 +250,9 @@ def search(
 
 
     results = spotify.recommendations(
-        seed_artists=seed_artists,
-        seed_genres=seed_genres,
-        seed_tracks=seed_tracks,
+        seed_artists=artists,
+        seed_genres=genres,
+        seed_tracks=tracks,
         limit=limit,
         **filters,
     )
