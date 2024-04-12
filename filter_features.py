@@ -48,3 +48,13 @@ def filter_time_signature(track_info, features, time_signature):
     if features["time_signature"] == int(time_signature):
         track_info["Time Signature"] = features["time_signature"]
     return track_info
+
+#For filtering loudness
+def filter_liveness(track_info, features, liveness):
+    min_live, max_live = map(float, liveness.split('-'))
+    #Check to make sure liveness is given within range 0-1
+    if min_live < 0.0 or max_live > 1.0:
+        raise ValueError(f"Liveness outside scope. Values must be between 0.0 and 1. Ex: 0.1-0.9")
+    if min_live <= features["liveness"] <= max_live:
+        track_info["Liveness"] = features["liveness"]
+    return track_info

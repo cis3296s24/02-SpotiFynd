@@ -1,7 +1,7 @@
 import typer
 from spotipy.oauth2 import SpotifyClientCredentials
 from dataframe import create_dataframe
-from filter_features import filter_pitch, filter_tempo, filter_danceability, filter_acousticness, filter_time_signature
+from filter_features import filter_pitch, filter_tempo, filter_danceability, filter_acousticness, filter_time_signature, filter_liveness
 from track_info import get_track_info_and_features, spotify
 from save_load import save_filters, load_filters
 
@@ -23,7 +23,7 @@ def uri_from_search(name: str, search_type: str):
         raise ValueError(f"No {search_type}s found with the name {name}")
 
 #Dictionary of filter handlers for filtering in top_tracks, this is used when filtering a song by feature
-filter_handlers = {"pitch": filter_pitch, "tempo": filter_tempo, "danceabillity": filter_danceability,"acousticness": filter_acousticness, "time_signature": filter_time_signature}
+filter_handlers = {"pitch": filter_pitch, "tempo": filter_tempo, "danceabillity": filter_danceability,"acousticness": filter_acousticness, "time_signature": filter_time_signature, "liveness": filter_liveness}
 
 @app.command()
 #top_tracks passed arguments based on flags such as -a or -s
@@ -34,6 +34,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                danceabillity: str = typer.Option(None, '-d', '--dance'),
                time_signature: str = typer.Option(None, '-ts', '--time_signature'),
                acousticness: str = typer.Option(None,'-ac', '--acoustic'),
+               liveness: str = typer.Option(None, 'l', '--liveness'),
                help: str = typer.Option(None, '-h', '--help'),
                save: bool = None,
                load: bool = None,
@@ -68,11 +69,12 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
           "\n'-d'  or '--dance'  for dance" +
           "\n'-ac' or '--acoust' for acoustic" +
           "\n'-ts' or '--time_signature' for time signature" +
+          "\n'-l'  or '--liveness' for liveness" +
           "\n'-h'  or '--help'   for help" +   
           "\nHAVE FUN!")   
     
     #Used to filter the search results
-    flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceabillity": danceabillity, "acousticness": acousticness, "time_signature": time_signature}
+    flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceabillity": danceabillity, "acousticness": acousticness, "time_signature": time_signature, "liveness": liveness}
     
     #artist flag passed limited to 10 results
     if artist:
