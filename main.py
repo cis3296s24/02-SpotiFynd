@@ -24,7 +24,7 @@ def uri_from_search(name: str, search_type: str):
 
 #Dictionary of filter handlers for filtering in top_tracks, this is used when filtering a song by feature
 
-filter_handlers = {"pitch": filter_pitch, "tempo": filter_tempo, "danceabillity": filter_danceability,"acousticness": filter_acousticness, "time_signature": filter_time_signature, "liveness": filter_liveness}
+filter_handlers = {"pitch": filter_pitch, "tempo": filter_tempo, "danceability": filter_danceability,"acousticness": filter_acousticness, "time_signature": filter_time_signature, "liveness": filter_liveness}
 
 @app.command()
 #top_tracks passed arguments based on flags such as -a or -s
@@ -80,7 +80,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
     else:
         
         #Used to filter the search results
-        flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceabillity": danceabillity, "acousticness": acousticness, "time_signature": time_signature, "liveness": liveness}
+        flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceability": danceability, "acousticness": acousticness, "time_signature": time_signature, "liveness": liveness}
         
         #artist flag passed limited to 10 results
         if artist:
@@ -88,7 +88,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
             name = artist
         #song flag passed limited by limit= in uri_from_search
 
-        elif song or tempo or pitch or danceabillity or acousticness or time_signature:
+        elif song or tempo or pitch or danceability or acousticness or time_signature:
             search_type = "track"
             name = song
         else:
