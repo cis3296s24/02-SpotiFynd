@@ -161,8 +161,8 @@ def feature(name: str, minimum: number, maximum: number):
 
     # create a custom parser for the inputted audio feature
     def number_range(value: str) -> tuple[number | None, number | None] | number:
-        if ":" in value:  # Range provided
-            low, high = value.split(":")
+        if "-" in value:  # Range provided
+            low, high = value.split("-")
 
             low = convert(low) if low else None
             high = convert(high) if high else None
@@ -231,8 +231,7 @@ def search(
         valence=feature("valence", 0.0, 1.0),
 ):
 
-    non_features = {"limit", "artists", "genres", "tracks", "filters", "non_features"}
-    audio_features = {k: v for k, v in locals().items() if k not in non_features and v is not None}
+    audio_features = {k: v for k, v in locals().items() if k not in {"limit", "artists", "genres", "tracks", "filters"} and v is not None}
     filters = {}
 
     for audio_feature, value in audio_features.items():
