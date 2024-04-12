@@ -11,7 +11,7 @@ class Credentials():
         self.client_id = client_id
         self.client_secret = client_secret
         self.username = username
-        self.redirect_uri = "http://localhost:5000"
+        self.redirect_uri = "http://localhost:3000"
         self.scope = ""
 
 cred = Credentials()
