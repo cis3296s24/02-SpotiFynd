@@ -23,6 +23,7 @@ def uri_from_search(name: str, search_type: str):
         raise ValueError(f"No {search_type}s found with the name {name}")
 
 #Dictionary of filter handlers for filtering in top_tracks, this is used when filtering a song by feature
+
 filter_handlers = {"pitch": filter_pitch, "tempo": filter_tempo, "danceabillity": filter_danceability,"acousticness": filter_acousticness, "time_signature": filter_time_signature, "liveness": filter_liveness}
 
 @app.command()
@@ -31,21 +32,22 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                song: str = typer.Option(None, '-s', '--song'),
                pitch: str = typer.Option(None, '-p', '--pitch'),
                tempo: str = typer.Option(None, '-t', '--tempo'),
-               danceabillity: str = typer.Option(None, '-d', '--dance'),
+               danceability: str = typer.Option(None, '-d', '--dance'),
                time_signature: str = typer.Option(None, '-ts', '--time_signature'),
+
                acousticness: str = typer.Option(None,'-ac', '--acoustic'),
                liveness: str = typer.Option(None, '-l', '--liveness'),
+
                help: str = typer.Option(None, '-h', '--help'),
                save: bool = None,
                load: bool = None,
-):
+               ):
     
     if save is not None:
-        save_filters(tempo, pitch)
-        return
+        save_filters(pitch, tempo, danceability, time_signature, acousticness)
 
     if load is not None:
-        pitch, tempo = load_filters()
+        pitch, tempo, danceability, time_signature, acousticness = load_filters()
     
     print(r"     _________              __  .__  _____                  .___")
     print(r"    /   _____/_____   _____/  |_|__|/ ____\__.__. ____    __| _/")
@@ -71,8 +73,10 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
           "\n'-ts' or '--time_signature' for time signature" +
           "\n'-l'  or '--liveness' for liveness" +
           "\n'-h'  or '--help'   for help" +   
+
           "\nHAVE FUN!")
         
+
     else:
         
         #Used to filter the search results
