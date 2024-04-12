@@ -153,22 +153,31 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
     df = create_dataframe(track_data)
 
 
-AUDIO_FEATURES = {
-    "acousticness": float,
-    "danceability": float,
-    "duration_ms": int,
-    "energy": float,
-    "instrumentalness": float,
-    "key": int,
-    "liveness": float,
-    "loudness": float,
-    "mode": int,
-    "speechiness": float,
-    "tempo": float,
-    "valence": float,
-    "popularity": int,
-    "time_signature": int,
-}
+number = float | int
+def feature(name: str, minimum: number, maximum: number):
+    short_flag = f"-{name[:2]}"
+    long_flag = f"--{name}"
+    convert = type(minimum)
+
+    # create a custom parser for the inputted audio feature
+    def number_range(value: str) -> tuple[number | None, number | None] | number:
+        if ":" in value:  # Range provided
+            low, high = value.split(":")
+
+            low = convert(low) if low else None
+            high = convert(high) if high else None
+
+            if low is not None and low < minimum or high is not None and high > maximum:
+                raise ValueError
+            return low, high
+
+        # Single value provided
+        value = convert(value)
+        if not minimum <= value <= maximum:
+            raise ValueError
+        return value
+
+    return typer.Option(None, short_flag, long_flag, help=f"{minimum} to {maximum}", parser=number_range)
 
 
 def artists_from_string(string: str) -> list[str]:
@@ -187,9 +196,13 @@ def genres_from_string(string: str) -> list[str]:
 
 Search for tracks based on audio features. Note: at least one of {artists, genres, tracks} is required, and their combined total cannot exceed five. 
 
-For all numerical values, you can provide a range with a dash.
+For all numerical values, you can provide a range with a colon.
 
-For example, -t 100-120 will return tracks with a tempo between 100 and 120.
+For example, --tempo 100-120 will return tracks with a tempo between 100 and 120.
+
+--valence -0.9 will return tracks with a valence at or below 0.9
+
+--loudness 0.4- will return tracks with a loudness at or above 0.4
 
 For artists, genres, and tracks, you can provide a comma-separated list
 
@@ -202,40 +215,42 @@ def search(
         genres: str = typer.Option(None, "-g", "--genres", help="Results will be in this genre."),
         tracks: str = typer.Option(None, "-t", "--tracks", help="Results will be similar to these tracks."),
 
-        acousticness: str = typer.Option(None, "-ac", "--acousticness", help="0.0 to 1.0"),
-        danceability: str = typer.Option(None, "-da", "--danceability", help="0.0 to 1.0"),
-        duration_ms: str = typer.Option(None, "-du", "--duration_ms", help="0.0 or more"),
-        energy: str = typer.Option(None, "-e", "--energy", help="0.0 to 1.0"),
-        instrumentalness: str = typer.Option(None, "-i", "--instrumentalness", help="0.0 to 1.0"),
-        key: str = typer.Option(None, "-k", "--key", help="0 to 11"),
-        liveness: str = typer.Option(None, "-li", "--liveness", help="0.0 to 1.0"),
-        loudness: str = typer.Option(None, "-lo", "--loudness", help="−60.0 to 0.0"),
-        mode: str = typer.Option(None, "-m", "--mode", help="0 or 1"),
-        popularity: str = typer.Option(None, "-p", "--popularity", help="0 to 100"),
-        speechiness: str = typer.Option(None, "-s", "--speechiness", help="0.0 to 1.0"),
-        tempo: str = typer.Option(None, "-te", "--tempo", help="0.0 or more"),
-        time_signature: str = typer.Option(None, "-ts", "--time_signature", help="3 to 7"),
-        valence: str = typer.Option(None, "-v", "--valence", help="0.0 to 1.0"),
+        acousticness=feature("acousticness", 0.0, 1.0),
+        danceability=feature("danceability", 0.0, 1.0),
+        duration_ms=feature("duration_ms", 0, float("inf")),
+        energy=feature("energy", 0.0, 1.0),
+        instrumentalness=feature("instrumentalness", 0.0, 1.0),
+        key=feature("key", 0, 11),
+        liveness=feature("liveness", 0.0, 1.0),
+        loudness=feature("loudness", -60.0, 0.0),
+        mode=feature("mode", 0, 1),
+        popularity=feature("popularity", 0, 100),
+        speechiness=feature("speechiness", 0.0, 1.0),
+        tempo=feature("tempo", 0.0, float("inf")),
+        time_signature=feature("time_signature", 3, 7),
+        valence=feature("valence", 0.0, 1.0),
 ):
     seed_artists = artists_from_string(artists) if artists is not None else None
     seed_genres = genres_from_string(genres) if genres is not None else None
     seed_tracks = tracks_from_string(tracks) if tracks is not None else None
 
-    audio_features = set()
+    non_features = {"limit", "artists", "genres", "tracks", "seed_artists", "seed_genres", "seed_tracks", "filters", "non_features"}
+    audio_features = {k: v for k, v in locals().items() if k not in non_features and v is not None}
     filters = {}
-    for audio_feature, value in locals().items():
-        if value is None or audio_feature not in AUDIO_FEATURES:
-            continue
-        conversion = AUDIO_FEATURES[audio_feature]
-        audio_features.add(audio_feature)
-        if "-" in value:  # Range provided
-            minimum, maximum = value.split("-")
-            if minimum:
-                filters[f"min_{audio_feature}"] = conversion(minimum)
-            if maximum:
-                filters[f"max_{audio_feature}"] = conversion(maximum)
-        else:  # Single value provided
-            filters[f"target_{audio_feature}"] = conversion(value)
+
+    for audio_feature, value in audio_features.items():
+        if isinstance(value, tuple):
+            low, high = value
+            if low is not None:
+                filters[f"min_{audio_feature}"] = low
+            if high is not None:
+                filters[f"max_{audio_feature}"] = high
+        else:
+            filters[f"target_{audio_feature}"] = value
+
+    if "popularity" in audio_features:
+        del audio_features["popularity"]  # for some reason, Spotify doesn't include this in the returned results
+
 
     results = spotify.recommendations(
         seed_artists=seed_artists,
