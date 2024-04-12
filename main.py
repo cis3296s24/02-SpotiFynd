@@ -196,7 +196,7 @@ def genres_from_string(string: str) -> list[str]:
 
 Search for tracks based on audio features. Note: at least one of {artists, genres, tracks} is required, and their combined total cannot exceed five. 
 
-For all numerical values, you can provide a range with a colon.
+For all numerical values, you can provide a range with a dash.
 
 For example, --tempo 100-120 will return tracks with a tempo between 100 and 120.
 
