@@ -1,31 +1,45 @@
+import statistics
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-import numpy as np
-import collections
 from dataframe import create_dataframe
 from credentials import cred
 
-#By default suggestions are limited to 50 songs
 def generate_user_tracks(limit=50):
-
     #Create a Spotify object with the user's credentials
     user_spotify = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=cred.client_id, client_secret=cred.client_secret, redirect_uri=cred.redirect_uri, scope=cred.scope))
 
     #Retrieve the user's saved tracks
-    results = user_spotify.current_user_saved_tracks()
+    saved_tracks = user_spotify.current_user_saved_tracks()
+    saved_track_ids = [track['track']['id'] for track in saved_tracks['items']]
+    
+    #Retrieves up to limit amount of users top songs over a period of time
+    top_tracks = user_spotify.current_user_top_tracks(time_range='long_term', limit=25)
+    top_track_ids = [track['id'] for track in top_tracks['items']]
+    
+    #Combine seeding for song_recommendations, limited to 5 seeds
+    seeded_tracks = (saved_track_ids + top_track_ids)[:5]
+    
+    #Retrieve song recommendations based on seeds
+    song_recommendations = user_spotify.recommendations(seed_tracks=seeded_tracks[:5], limit=limit)
 
-    #Get the audio features and genres for each of the user's saved tracks
-    tracks = results['items']
-    track_ids = [track['track']['id'] for track in tracks]
-    features = user_spotify.audio_features(track_ids)
-    genres = [user_spotify.artist(track['track']['artists'][0]['id'])['genres'] for track in tracks]
+    #Prepare the data for create_dataframe
+    track_data = []
+    for track in song_recommendations['tracks']:
+        #skip the song if already saved
+        if track['id'] in saved_track_ids:
+            continue
+        #else add it to be output to dataframe
+        track_info = {
+            "Art": track["album"]["images"][0]["url"],
+            "Artist": track["artists"][0]["name"],
+            "Song": track["name"],
+        }
+        track_audio_features = user_spotify.audio_features(track["id"])[0]
+        for audio_feature in track_audio_features:
+            track_info[audio_feature] = track_audio_features[audio_feature]
+        track_data.append(track_info)
 
-    #Weight the seeding by the top genres
-    genres = [genre for sublist in genres for genre in sublist]
-    top_genres = [genre for genre, count in collections.Counter(genres).most_common(5)]
+    #Create a dataframe from the song recommendations
+    df = create_dataframe(track_data)
 
-    #Calculate the average values for each feature
-    avg_features = {feature: np.mean([f[feature] for f in features]) for feature in features[0]}
-
-    #Get recommendations based on the top genres and average features
-    song_recommendations = user_spotify.recommendations(seed_genres=top_genres, limit=limit)
+    return df
