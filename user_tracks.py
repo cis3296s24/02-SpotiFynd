@@ -15,7 +15,7 @@ def generate_user_tracks(limit=50):
     saved_track_ids = set(track['track']['id'] for track in saved_tracks['items'])
 
     #Retrieve the user's top tracks up to 100 songs
-    top_tracks = user_spotify.current_user_top_tracks(time_range='long_term', limit=min(limit, 100))
+    top_tracks = user_spotify.current_user_top_tracks(time_range='medium_term', limit=min(limit, 50))
 
     #Get the artist IDs from the top tracks
     artist_ids = [track['artists'][0]['id'] for track in top_tracks['items']]
@@ -31,10 +31,11 @@ def generate_user_tracks(limit=50):
 
     #Find the most common genres. The amount for this + seeded tracks must = 5
     flattened_genres = [genre for genres in top_artist_genres for genre in genres]
-    most_common_genre = collections.Counter(flattened_genres).most_common(1)[0][0]
+    #(number) + seeded_tracks cannot exceed 5
+    most_common_genre = collections.Counter(flattened_genres).most_common(1)[0][0] 
 
-    #Combine seeds for song recommendations
-    seeded_tracks = (list(saved_track_ids)[:3] + top_track_ids[:1])
+    #Combine seeds for song recommendations [:#] value corresponds to weight. These values + most_common_genre cannot exceed 5
+    seeded_tracks = (list(saved_track_ids)[:1] + top_track_ids[:3])
 
     #Retrieve song recommendations based on track and genre seeds
     song_recommendations = user_spotify.recommendations(seed_tracks=seeded_tracks, seed_genres=[most_common_genre], limit=limit)
