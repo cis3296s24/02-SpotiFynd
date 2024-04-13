@@ -1,4 +1,4 @@
-import statistics
+import collections
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from dataframe import create_dataframe
@@ -16,11 +16,18 @@ def generate_user_tracks(limit=50):
     top_tracks = user_spotify.current_user_top_tracks(time_range='long_term', limit=25)
     top_track_ids = [track['id'] for track in top_tracks['items']]
     
-    #Combine seeding for song_recommendations, limited to 5 seeds
-    seeded_tracks = (saved_track_ids + top_track_ids)[:5]
+    top_artist_genres = [user_spotify.artist(track['artists'][0]['id'])['genres'] for track in top_tracks['items']]
+
+    #The value amounts for most_common_genres + seeded_tracks must equal 5
+    flattened_genres = [genre for genres in top_artist_genres for genre in genres]
+    most_common_genres = [genre for genre, _ in collections.Counter(flattened_genres).most_common(1)]
+    
+    #Combine seeding for song_recommendations
+    #The value amounts for most_common_genres + seeded_tracks must equal 5
+    seeded_tracks = (saved_track_ids[:3] + top_track_ids[:1])
     
     #Retrieve song recommendations based on seeds
-    song_recommendations = user_spotify.recommendations(seed_tracks=seeded_tracks[:5], limit=limit)
+    song_recommendations = user_spotify.recommendations(seed_tracks=seeded_tracks, seed_genres=most_common_genres, limit=limit)
 
     #Prepare the data for create_dataframe
     track_data = []
