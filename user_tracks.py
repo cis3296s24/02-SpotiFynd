@@ -39,7 +39,11 @@ def generate_user_tracks(limit=50):
 
     #Prepare the data for create_dataframe
     track_data = []
-    for track in song_recommendations['tracks']:
+    recommended_track_ids = [track['id'] for track in song_recommendations['tracks'] if track['id'] not in saved_track_ids]
+    #Get all features in one API call
+    track_audio_features_list = user_spotify.audio_features(recommended_track_ids)
+
+    for track, track_audio_features in zip(song_recommendations['tracks'], track_audio_features_list):
         #Skip the song if already saved
         if track['id'] in saved_track_ids:
             continue
@@ -49,13 +53,12 @@ def generate_user_tracks(limit=50):
             "Artist": track["artists"][0]["name"],
             "Song": track["name"],
         }
-        track_audio_features = user_spotify.audio_features(track["id"])[0]
         for audio_feature in track_audio_features:
             if audio_feature not in ['type', 'id', 'uri', 'track_href', 'analysis_url']:
                 track_info[audio_feature] = track_audio_features[audio_feature]
         track_data.append(track_info)
 
-    #sCreate a dataframe from the song recommendations
+    #Create a dataframe from the song recommendations
     df = create_dataframe(track_data)
 
     return df
