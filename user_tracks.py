@@ -14,8 +14,8 @@ def generate_user_tracks(limit=50):
     saved_tracks = user_spotify.current_user_saved_tracks()
     saved_track_ids = set(track['track']['id'] for track in saved_tracks['items'])
 
-    #Retrieve the user's top tracks up to limit
-    top_tracks = user_spotify.current_user_top_tracks(time_range='long_term', limit=25)
+    #Retrieve the user's top tracks up to 100 songs
+    top_tracks = user_spotify.current_user_top_tracks(time_range='long_term', limit=min(limit, 100))
 
     #Get the artist IDs from the top tracks
     artist_ids = [track['artists'][0]['id'] for track in top_tracks['items']]
