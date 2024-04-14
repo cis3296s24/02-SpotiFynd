@@ -26,6 +26,6 @@ class Credentials():
 
         self.redirect_uri = "http://localhost:3000"
         #Scope must correspond to the features required for reading library, tracks, and playlist creation
-        self.scope = "user-library-read user-top-read"
+        self.scope = "user-library-read user-top-read playlist-modify-public playlist-modify-private"
 
 cred = Credentials()
