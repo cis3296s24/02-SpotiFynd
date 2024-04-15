@@ -4,6 +4,7 @@ from dataframe import create_dataframe
 from filter_features import filter_pitch, filter_tempo, filter_danceability, filter_acousticness, filter_time_signature, filter_liveness, filter_energy
 from track_info import get_track_info_and_features, spotify
 from save_load import save_filters, load_filters
+from create_playlist import create_playlist, add_to_playlist
 
 #spotify = spotipy.Spotify(auth_manager=SpotifyClientCredentials())
 #spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
@@ -126,7 +127,6 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                                 track_data[-1] = handler(track_info, features, flags[flag])       
         df = create_dataframe(track_data)
 
-
 number = float | int
 
 
@@ -248,6 +248,11 @@ def search(
 @app.command()
 def generate(limit: int = typer.Option(50, '-l', '--limit')):
     generate_user_tracks(limit)
+
+@app.command()
+def create_playlist(name:str = typer.Option(None, "-n", "--name")):
+    new_playlist = create_playlist(name)
+    add_to_playlist(new_playlist)
 
 if __name__ == "__main__":
     app()
