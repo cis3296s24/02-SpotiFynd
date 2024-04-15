@@ -1,6 +1,7 @@
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import pandas as pd
+from dataframe import create_dataframe
 
 class Credentials():
     def __init__(self):
@@ -58,22 +59,26 @@ def get_playlists_info()->pd.DataFrame:
 
     return df
 
-def add_to_playlist(playlist_id:str, song_uri:list, position:int = 0)->int:
+def add_to_playlist(playlist_id:str, position:int = 0)->int:
     #Remove later after testing
     cred.scope = "playlist-modify-private playlist-modify-public"
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
-            client_id=cred.client_id,
-            client_secret=cred.client_secret,
-            username=cred.username,
-            redirect_uri=cred.redirect_uri,
-            scope = cred.scope
-        )
-    )
-
-    sp.playlist_add_items(playlist_id=playlist_id, items=song_uri, position=position)
+        client_id=cred.client_id,
+        client_secret=cred.client_secret,
+        username=cred.username,
+        redirect_uri=cred.redirect_uri,
+        scope = cred.scope
+        ))
+    songs = []
+    with open("df.html", "r", encoding="utf-8") as df:
+        uris = df['URI']
+        for uri in uris:
+            songs.append(uri)
+        
+    sp.playlist_add_items(playlist_id=playlist_id, items=songs, position=position)
     return 0
 
-if __name__ == "__main__":
+"""if __name__ == "__main__":
     new_playlist = create_playlist("Software Design Shits 4")
     print(get_playlists_info().head(10))
     songs = ["spotify:track:3vkQ5DAB1qQMYO4Mr9zJN6",
@@ -81,4 +86,4 @@ if __name__ == "__main__":
              "spotify:track:3ktTWpYdXrYApH54cBo4Ap"]
     
     add_to_playlist(new_playlist, songs)
-    
+    """
