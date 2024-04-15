@@ -244,6 +244,10 @@ def search(
         track_data.append(track_info)
 
     create_dataframe(track_data)
+    
+@app.command()
+def generate(limit: int = typer.Option(50, '-l', '--limit')):
+    generate_user_tracks(limit)
 
 if __name__ == "__main__":
     app()
