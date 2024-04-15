@@ -58,3 +58,13 @@ def filter_liveness(track_info, features, liveness):
     if min_live <= features["liveness"] <= max_live:
         track_info["Liveness"] = features["liveness"]
     return track_info
+
+#For filtering energy
+def filter_energy(track_info, features, energy):
+    min_energy, max_energy = map(float, energy.split('-'))
+    #Check to make sure energy is within given range 0-1
+    if min_energy < 0.0 or max_energy > 1.0:
+        raise ValueError(f"Energy outside scope. Values must be between 0.0 and 1.0. Ex: 0.2-0.8")
+    if min_energy <= features["energy"] <= max_energy:
+        track_info["Energy"] = features["energy"]
+    return track_info

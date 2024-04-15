@@ -1,24 +1,15 @@
 import typer
 from spotipy.oauth2 import SpotifyClientCredentials
 from dataframe import create_dataframe
-from filter_features import filter_pitch, filter_tempo, filter_danceability, filter_acousticness, filter_time_signature, filter_liveness
+from filter_features import filter_pitch, filter_tempo, filter_danceability, filter_acousticness, filter_time_signature, filter_liveness, filter_energy
 from track_info import get_track_info_and_features, spotify
 from save_load import save_filters, load_filters
-from user_tracks import generate_user_tracks
 
 #spotify = spotipy.Spotify(auth_manager=SpotifyClientCredentials())
 #spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 
 #spotipy_fix(spotify) #may need to resolve with track_info
 app = typer.Typer()
-
-def apply_filters(track_info, features, filters):
-    for flag, handler in filter_handlers.items():
-        if filters[flag] is not None:
-            track_info = handler(track_info, features, filters[flag])
-            if track_info is None:
-                return None
-    return track_info
 
 def uri_from_search(name: str, search_type: str):
     #limit determines amount of results, artist and album are limited to 10 results via API
@@ -32,7 +23,8 @@ def uri_from_search(name: str, search_type: str):
         raise ValueError(f"No {search_type}s found with the name {name}")
 
 #Dictionary of filter handlers for filtering in top_tracks, this is used when filtering a song by feature
-filter_handlers = {"pitch": filter_pitch, "tempo": filter_tempo, "danceability": filter_danceability,"acousticness": filter_acousticness, "time_signature": filter_time_signature, "liveness": filter_liveness}
+
+filter_handlers = {"pitch": filter_pitch, "tempo": filter_tempo, "danceability": filter_danceability,"acousticness": filter_acousticness, "time_signature": filter_time_signature, "liveness": filter_liveness, "energy": filter_energy}
 
 @app.command()
 #top_tracks passed arguments based on flags such as -a or -s
@@ -45,6 +37,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
 
                acousticness: str = typer.Option(None,'-ac', '--acoustic'),
                liveness: str = typer.Option(None, '-l', '--liveness'),
+               energy: str = typer.Option(None, '-e', '--energy'),
 
                help: str = typer.Option(None, '-h', '--help'),
                save: bool = None,
@@ -52,10 +45,10 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                ):
     
     if save is not None:
-        save_filters(pitch, tempo, danceability, time_signature, acousticness)
+        save_filters(pitch, tempo, danceability, time_signature, acousticness, energy)
 
     if load is not None:
-        pitch, tempo, danceability, time_signature, acousticness = load_filters()
+        pitch, tempo, danceability, time_signature, acousticness, energy = load_filters()
     
     print(r"     _________              __  .__  _____                  .___")
     print(r"    /   _____/_____   _____/  |_|__|/ ____\__.__. ____    __| _/")
@@ -80,6 +73,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
           "\n'-ac' or '--acoust' for acoustic" +
           "\n'-ts' or '--time_signature' for time signature" +
           "\n'-l'  or '--liveness' for liveness" +
+          "\n'-e'  or '--energy' for energy" +
           "\n'-h'  or '--help'   for help" +   
 
           "\nHAVE FUN!")
@@ -88,7 +82,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
     else:
         
         #Used to filter the search results
-        flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceability": danceability, "acousticness": acousticness, "time_signature": time_signature, "liveness": liveness}
+        flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceability": danceability, "acousticness": acousticness, "time_signature": time_signature, "liveness": liveness, "energy": energy}
         
         #artist flag passed limited to 10 results
         if artist:
@@ -96,7 +90,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
             name = artist
         #song flag passed limited by limit= in uri_from_search
 
-        elif song or tempo or pitch or danceability or acousticness or time_signature:
+        elif song or tempo or pitch or danceability or acousticness or time_signature or energy:
             search_type = "track"
             name = song
         else:
@@ -108,9 +102,13 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
         if search_type == "track":
             all_info = get_track_info_and_features(ids)
             for track_info, features in all_info:
-                filtered_track_info = apply_filters(track_info, features, flags)
-                if filtered_track_info is not None:
-                    track_data.append(filtered_track_info)
+                #Always append track_info to track_data
+                track_data.append(track_info)
+                #Apply filters, filter_handlers is a dictionary of filter functions that calls on the filtering functions
+                for flag, handler in filter_handlers.items(): 
+                    if flags[flag] is not None:
+                        #Update the last element of track_data with the filtered track_info
+                        track_data[-1] = handler(track_info, features, flags[flag])
         #Artist search
         else:
             for id in ids:
@@ -118,14 +116,135 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                 track_ids = [track["id"] for track in results["tracks"]]
                 if track_ids:
                     all_info = get_track_info_and_features(track_ids) #gets track info and features
+                    #for all requested info
                     for track_info, features in all_info:
-                        filtered_track_info = apply_filters(track_info, features, flags)
-                        if filtered_track_info is not None:
-                            track_data.append(filtered_track_info)      
+                        #Operation is always done
+                        track_data.append(track_info)
+                        #Apply filters
+                        for flag, handler in filter_handlers.items():
+                            if flags[flag] is not None:
+                                track_data[-1] = handler(track_info, features, flags[flag])       
         df = create_dataframe(track_data)
 
 
-#Used to generate song suggestions based on the users saved songs
+number = float | int
+
+
+def feature(name: str, minimum: number, maximum: number):
+    short_flag = f"-{name[:2]}"
+    long_flag = f"--{name}"
+    convert = type(minimum)
+
+    # create a custom parser for the inputted audio feature
+    def number_range(value: str) -> tuple[number | None, number | None] | number:
+        if "-" in value:  # Range provided
+            low, high = value.split("-")
+
+            low = convert(low) if low else None
+            high = convert(high) if high else None
+
+            if low is not None and low < minimum or high is not None and high > maximum:
+                raise ValueError
+            return low, high
+
+        # Single value provided
+        value = convert(value)
+        if not minimum <= value <= maximum:
+            raise ValueError
+        return value
+
+    return typer.Option(None, short_flag, long_flag, help=f"{minimum} to {maximum}", parser=number_range)
+
+
+def artists_from_string(string: str) -> list[str]:
+    return [uri_from_search(artist.strip(), "artist")[0] for artist in string.split(",")]
+
+
+def tracks_from_string(string: str) -> list[str]:
+    return [uri_from_search(track.strip(), "track")[0] for track in string.split(",")]
+
+
+def genres_from_string(string: str) -> list[str]:
+    return [genre.strip() for genre in string.split(",")]
+
+
+@app.command(help="""
+
+Search for tracks based on audio features. Note: at least one of {artists, genres, tracks} is required, and their combined total cannot exceed five. 
+
+For all numerical values, you can provide a range with a dash.
+
+For example, --tempo 100-120 will return tracks with a tempo between 100 and 120.
+
+--valence -0.9 will return tracks with a valence at or below 0.9
+
+--loudness 0.4- will return tracks with a loudness at or above 0.4
+
+For artists, genres, and tracks, you can provide a comma-separated list
+
+For example, -a "artist1, artist2" will return tracks by artists similar to artist1 and artist2.
+""")
+def search(
+        limit: int = typer.Option(20, "-l", "--limit", help="Number of results to return."),
+
+        artists: str = typer.Option(None, "-a", "--artists", help="Results will be tracks by similar artists.", parser=artists_from_string),
+        genres: str = typer.Option(None, "-g", "--genres", help="Results will be in this genre.", parser=genres_from_string),
+        tracks: str = typer.Option(None, "-t", "--tracks", help="Results will be similar to these tracks.", parser=tracks_from_string),
+
+        acousticness=feature("acousticness", 0.0, 1.0),
+        danceability=feature("danceability", 0.0, 1.0),
+        duration_ms=feature("duration_ms", 0, float("inf")),
+        energy=feature("energy", 0.0, 1.0),
+        instrumentalness=feature("instrumentalness", 0.0, 1.0),
+        key=feature("key", 0, 11),
+        liveness=feature("liveness", 0.0, 1.0),
+        loudness=feature("loudness", -60.0, 0.0),
+        mode=feature("mode", 0, 1),
+        popularity=feature("popularity", 0, 100),
+        speechiness=feature("speechiness", 0.0, 1.0),
+        tempo=feature("tempo", 0.0, float("inf")),
+        time_signature=feature("time_signature", 3, 7),
+        valence=feature("valence", 0.0, 1.0),
+):
+
+    audio_features = {k: v for k, v in locals().items() if k not in {"limit", "artists", "genres", "tracks", "filters"} and v is not None}
+    filters = {}
+
+    for audio_feature, value in audio_features.items():
+        if isinstance(value, tuple):
+            low, high = value
+            if low is not None:
+                filters[f"min_{audio_feature}"] = low
+            if high is not None:
+                filters[f"max_{audio_feature}"] = high
+        else:
+            filters[f"target_{audio_feature}"] = value
+
+    if "popularity" in audio_features:
+        del audio_features["popularity"]  # for some reason, Spotify doesn't include this in the returned results
+
+    results = spotify.recommendations(
+        seed_artists=artists,
+        seed_genres=genres,
+        seed_tracks=tracks,
+        limit=limit,
+        **filters,
+    )
+
+    track_data = []
+    for track in results["tracks"]:
+        track_info = {
+            "Art": track["album"]["images"][0]["url"],
+            "Artist": track["artists"][0]["name"],
+            "Song": track["name"],
+        }
+        track_audio_features = spotify.audio_features(track["id"])[0]
+        for audio_feature in audio_features:
+            track_info[audio_feature] = track_audio_features[audio_feature]
+        track_data.append(track_info)
+
+    create_dataframe(track_data)
+    
 @app.command()
 def generate(limit: int = typer.Option(50, '-l', '--limit')):
     generate_user_tracks(limit)
