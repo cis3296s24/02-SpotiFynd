@@ -238,6 +238,7 @@ def search(
             "Art": track["album"]["images"][0]["url"],
             "Artist": track["artists"][0]["name"],
             "Song": track["name"],
+            "uri": track["uri"],
         }
         track_audio_features = spotify.audio_features(track["id"])[0]
         for audio_feature in audio_features:
