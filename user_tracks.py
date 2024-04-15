@@ -35,7 +35,7 @@ def generate_user_tracks(limit=50):
     most_common_genre = collections.Counter(flattened_genres).most_common(1)[0][0] 
 
     #Combine seeds for song recommendations [:#] value corresponds to weight. These values + most_common_genre cannot exceed 5
-    seeded_tracks = (list(saved_track_ids)[:1] + top_track_ids[:3])
+    seeded_tracks = (list(saved_track_ids)[:2] + top_track_ids[:2])
 
     #Retrieve song recommendations based on track and genre seeds
     song_recommendations = user_spotify.recommendations(seed_tracks=seeded_tracks, seed_genres=[most_common_genre], limit=limit)
@@ -58,7 +58,7 @@ def generate_user_tracks(limit=50):
             "Key": pitch_names[track_audio_features['key']] if track_audio_features['key'] is not None else None,
         }
         for audio_feature in track_audio_features:
-            if audio_feature not in ['type', 'id', 'uri', 'track_href', 'analysis_url', 'key']:
+            if audio_feature not in ['type', 'id', 'track_href', 'analysis_url', 'key']:
                 track_info[audio_feature] = track_audio_features[audio_feature]
         track_data.append(track_info)
 
