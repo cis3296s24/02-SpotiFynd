@@ -2,7 +2,7 @@
 import os
 import json
 
-def save_filters(pitch, tempo, danceability, time_signature, acousticness):
+def save_filters(pitch, tempo, danceability, time_signature, acousticness, energy):
     saved_filters = {}
     if pitch is not None:
         saved_filters["pitch"] = pitch
@@ -14,6 +14,8 @@ def save_filters(pitch, tempo, danceability, time_signature, acousticness):
         saved_filters["time_signature"] = time_signature
     if acousticness is not None:
         saved_filters["acousticness"] = acousticness
+    if energy is not None:
+        saved_filters["energy"] = energy
     with open("data.json", "w", encoding="utf-8") as file:
         json.dump(saved_filters, file, ensure_ascii=False, indent=4)
 
@@ -28,4 +30,5 @@ def load_filters():
         danceability = data.get("danceability")
         time_signature = data.get("time_signature")
         acousticness = data.get("acousticness")
-    return pitch, tempo, danceability, time_signature, acousticness
+        energy = data.get("energy")
+    return pitch, tempo, danceability, time_signature, acousticness, energy
