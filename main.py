@@ -5,6 +5,7 @@ from filter_features import filter_pitch, filter_tempo, filter_danceability, fil
 from track_info import get_track_info_and_features, spotify
 from save_load import save_filters, load_filters
 from create_playlist import create_playlist, add_to_playlist
+from user_tracks import generate_user_tracks
 
 #spotify = spotipy.Spotify(auth_manager=SpotifyClientCredentials())
 #spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
@@ -250,7 +251,7 @@ def generate(limit: int = typer.Option(50, '-l', '--limit')):
     generate_user_tracks(limit)
 
 @app.command()
-def create_playlist(name:str = typer.Option(None, "-n", "--name")):
+def playlist(name:str = typer.Option(None, "-n", "--name")):
     new_playlist = create_playlist(name)
     add_to_playlist(new_playlist)
 

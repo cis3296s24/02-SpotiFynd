@@ -2,20 +2,7 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import pandas as pd
 from dataframe import create_dataframe
-
-class Credentials():
-    def __init__(self):
-        client_id = input("Provide Client ID: ")
-        client_secret = input("Provide Client SECRET: ")
-        username = input("Provide Username: ")
-
-        self.client_id = client_id
-        self.client_secret = client_secret
-        self.username = username
-        self.redirect_uri = "http://localhost:3000"
-        self.scope = ""
-
-cred = Credentials()
+from credentials import cred
 
 def create_playlist(name:str = "test-playlist", is_public:bool = True)->str:
     cred.scope = "playlist-modify-private playlist-modify-public"
@@ -70,20 +57,11 @@ def add_to_playlist(playlist_id:str, position:int = 0)->int:
         scope = cred.scope
         ))
     songs = []
-    with open("df.html", "r", encoding="utf-8") as df:
-        uris = df['URI']
-        for uri in uris:
-            songs.append(uri)
+    dfs = pd.read_html("df.html", encoding="utf-8")
+    df = dfs[0]  # Assuming the first table is the one you want
+    uris = df['uri']
+    for uri in uris:
+        songs.append(uri)
         
     sp.playlist_add_items(playlist_id=playlist_id, items=songs, position=position)
     return 0
-
-"""if __name__ == "__main__":
-    new_playlist = create_playlist("Software Design Shits 4")
-    print(get_playlists_info().head(10))
-    songs = ["spotify:track:3vkQ5DAB1qQMYO4Mr9zJN6",
-             "spotify:track:2245x0g1ft0HC7sf79zbYN",
-             "spotify:track:3ktTWpYdXrYApH54cBo4Ap"]
-    
-    add_to_playlist(new_playlist, songs)
-    """
