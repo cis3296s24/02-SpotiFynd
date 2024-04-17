@@ -28,6 +28,9 @@ Proof of feasibility: https://github.com/tuo20482/spotify-data-cli
 1. Clone this repository to your local machine.
 2. Navigate to the cloned directory.
 3. Create a virtual environment:
+
+**Note: For users with later versions of python. The python and pip commands have been updataed to python3 & pip3.
+If this is the case on your machine replace python and pip with python3 and pip3 respectively.**
 ```
 python -m venv venv
 ```
