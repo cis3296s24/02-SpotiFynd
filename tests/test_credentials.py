@@ -1,4 +1,4 @@
-#testing the credentials.py file. Dependent that credentials have been input somewhere
+#testing the credentials.py file. Dependent that valid credentials have been stored in the credentials.json file
 import pytest
 import os
 import json
