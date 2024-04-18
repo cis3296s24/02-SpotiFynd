@@ -50,12 +50,12 @@ pip install -r requirements.txt
 
 ## Running the Application & Requirements
 - Running the program always requires a mode.
-- There are 4 modes when running the applications: _search_, _top-tracks_, _generate_ & _create-playlist_. Each of which has different running requirements.
+- There are 4 modes when running the applications: _search_, _top-tracks_, _suggest_ & _create-playlist_. Each of which has different running requirements.
 
 **Mode Descriptions**
 - search: Users receive suggested tracks and their song features based on input artist or song name(s) and flagged features.
 - top-tracks: Users receive songs that fit within their specified artist/song name and the flagged features.
-- generate: Users receive up to 100 suggested songs based on their saved songs, listening history, and most listened to genres.
+- suggest: Users receive up to 100 suggested songs based on their saved songs, listening history, and most listened to genres.
 - playlist: Creates a playlist on the users spotify account with the songs from the most previously generated list of songs. Requires songs to be output before running.
 
 **Mode Requirements and Examples**
@@ -83,13 +83,13 @@ pip install -r requirements.txt
   python main.py top-tracks -s "Dancing Queen" -ac "0.2-0.6" -ts "4"
   ```
 
-**generate**
+**suggest**
 - Required Flags: None
 - Optional Flags: --limit: Limits the number of songs returned to the user, up to a maximum of 100.
 
 - Example:
   ```
-  python main.py generate --limit 100
+  python main.py suggest --limit 100
   ```
   
 **playlist**

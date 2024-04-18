@@ -145,7 +145,7 @@ def search(
     create_dataframe(track_data)
     
 @app.command()
-def generate(limit: int = typer.Option(50, '-l', '--limit')):
+def suggest(limit: int = typer.Option(50, '-l', '--limit')):
     generate_user_tracks(limit)
 
 @app.command()
