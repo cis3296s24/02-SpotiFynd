@@ -2,7 +2,7 @@ import typer
 from spotipy.oauth2 import SpotifyClientCredentials
 from dataframe import create_dataframe
 from track_info import spotify
-from utility import uri_from_search
+from utility import uri_from_search, filter_handlers
 from create_playlist import create_playlist, add_to_playlist
 from user_tracks import generate_user_tracks
 from top_tracks import get_top_tracks

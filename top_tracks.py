@@ -11,11 +11,9 @@ def get_top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                tempo: str = typer.Option(None, '-t', '--tempo'),
                danceability: str = typer.Option(None, '-d', '--dance'),
                time_signature: str = typer.Option(None, '-ts', '--time_signature'),
-
                acousticness: str = typer.Option(None,'-ac', '--acoustic'),
                liveness: str = typer.Option(None, '-l', '--liveness'),
                energy: str = typer.Option(None, '-e', '--energy'),
-
                help: str = typer.Option(None, '-h', '--help'),
                save: bool = None,
                load: bool = None,
@@ -102,3 +100,5 @@ def get_top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                             if flags[flag] is not None:
                                 track_data[-1] = handler(track_info, features, flags[flag])       
         df = create_dataframe(track_data)
+        
+        return df

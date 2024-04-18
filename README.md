@@ -54,7 +54,7 @@ pip install -r requirements.txt
 
 **Mode Descriptions**
 - search: Users receive suggested tracks and their song features based on input artist or song name(s) and flagged features.
-- top-tracks: Users receive songs that fit within their specified artist/song name and the flagged features.
+- top-tracks: Users receive songs that fit within their specified artist/song name and the flagged features. Used to retrieve tracks with specific information.
 - suggest: Users receive up to 100 suggested songs based on their saved songs, listening history, and most listened to genres.
 - playlist: Creates a playlist on the users spotify account with the songs from the most previously generated list of songs. Requires songs to be output before running.
 
