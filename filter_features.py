@@ -68,3 +68,13 @@ def filter_energy(track_info, features, energy):
     if min_energy <= features["energy"] <= max_energy:
         track_info["Energy"] = features["energy"]
     return track_info
+
+#For filtering song duration
+def filter_liveness(track_info, features, duration):
+    min_dur, max_dur = map(float, duration.split('-'))
+    #Check to make sure liveness is given within range 0-1
+    if min_dur < 0.0:
+        raise ValueError(f"Duration is less 0 minutes and values must be greater than 0.0")
+    if min_dur <= features["duration"]:
+        track_info["duration"] = features["duration"]
+    return track_info
