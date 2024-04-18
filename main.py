@@ -1,7 +1,7 @@
 import typer
 from spotipy.oauth2 import SpotifyClientCredentials
 from dataframe import create_dataframe
-from filter_features import filter_pitch, filter_tempo, filter_danceability, filter_acousticness, filter_time_signature, filter_liveness, filter_energy
+from filter_features import filter_pitch, filter_tempo, filter_danceability, filter_acousticness, filter_time_signature, filter_liveness, filter_energy, filter_speechiness
 from track_info import get_track_info_and_features, spotify
 from save_load import save_filters, load_filters
 from create_playlist import create_playlist, add_to_playlist
@@ -26,7 +26,7 @@ def uri_from_search(name: str, search_type: str):
 
 #Dictionary of filter handlers for filtering in top_tracks, this is used when filtering a song by feature
 
-filter_handlers = {"pitch": filter_pitch, "tempo": filter_tempo, "danceability": filter_danceability,"acousticness": filter_acousticness, "time_signature": filter_time_signature, "liveness": filter_liveness, "energy": filter_energy}
+filter_handlers = {"pitch": filter_pitch, "tempo": filter_tempo, "danceability": filter_danceability,"acousticness": filter_acousticness, "time_signature": filter_time_signature, "liveness": filter_liveness, "energy": filter_energy, "speechiness": filter_speechiness}
 
 @app.command()
 #top_tracks passed arguments based on flags such as -a or -s
@@ -40,6 +40,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                acousticness: str = typer.Option(None,'-ac', '--acoustic'),
                liveness: str = typer.Option(None, '-l', '--liveness'),
                energy: str = typer.Option(None, '-e', '--energy'),
+               speechiness: str = typer.Option(None, '-sp', '--speechiness'),
 
                help: str = typer.Option(None, '-h', '--help'),
                save: bool = None,
@@ -76,6 +77,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
           "\n'-ts' or '--time_signature' for time signature" +
           "\n'-l'  or '--liveness' for liveness" +
           "\n'-e'  or '--energy' for energy" +
+          "\n'-sp' or '--speechiness' for speechiness" +
           "\n'-h'  or '--help'   for help" +   
 
           "\nHAVE FUN!")
@@ -84,7 +86,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
     else:
         
         #Used to filter the search results
-        flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceability": danceability, "acousticness": acousticness, "time_signature": time_signature, "liveness": liveness, "energy": energy}
+        flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceability": danceability, "acousticness": acousticness, "time_signature": time_signature, "liveness": liveness, "energy": energy, "speechiness": speechiness}
         
         #artist flag passed limited to 10 results
         if artist:
@@ -92,7 +94,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
             name = artist
         #song flag passed limited by limit= in uri_from_search
 
-        elif song or tempo or pitch or danceability or acousticness or time_signature or energy:
+        elif song or tempo or pitch or danceability or acousticness or time_signature or energy or speechiness:
             search_type = "track"
             name = song
         else:
@@ -205,7 +207,7 @@ def search(
         speechiness=feature("speechiness", 0.0, 1.0),
         tempo=feature("tempo", 0.0, float("inf")),
         time_signature=feature("time_signature", 3, 7),
-        valence=feature("valence", 0.0, 1.0),
+        valence=feature("valence", 0.0, 1.0)
 ):
 
     audio_features = {k: v for k, v in locals().items() if k not in {"limit", "artists", "genres", "tracks", "filters"} and v is not None}
