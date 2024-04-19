@@ -14,16 +14,17 @@ def get_top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                acousticness: str = typer.Option(None,'-ac', '--acoustic'),
                liveness: str = typer.Option(None, '-l', '--liveness'),
                energy: str = typer.Option(None, '-e', '--energy'),
+               speechiness: str = typer.Option(None, '-sp', '--speechiness'),
                help: str = typer.Option(None, '-h', '--help'),
                save: bool = None,
                load: bool = None,
                ):
     
     if save is not None:
-        save_filters(pitch, tempo, danceability, time_signature, acousticness, energy)
+        save_filters(pitch, tempo, danceability, time_signature, acousticness, energy, speechiness)
 
     if load is not None:
-        pitch, tempo, danceability, time_signature, acousticness, energy = load_filters()
+        pitch, tempo, danceability, time_signature, acousticness, energy, speechiness = load_filters()
     
     print(r"     _________              __  .__  _____                  .___")
     print(r"    /   _____/_____   _____/  |_|__|/ ____\__.__. ____    __| _/")
@@ -49,6 +50,7 @@ def get_top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
           "\n'-ts' or '--time_signature' for time signature" +
           "\n'-l'  or '--liveness' for liveness" +
           "\n'-e'  or '--energy' for energy" +
+          "\n'-sp' or '--speechiness' for speechiness" +
           "\n'-h'  or '--help'   for help" +   
 
           "\nHAVE FUN!")
@@ -57,7 +59,7 @@ def get_top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
     else:
         
         #Used to filter the search results
-        flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceability": danceability, "acousticness": acousticness, "time_signature": time_signature, "liveness": liveness, "energy": energy}
+        flags = {"artist": artist, "song": song, "pitch": pitch, "tempo": tempo, "danceability": danceability, "acousticness": acousticness, "time_signature": time_signature, "liveness": liveness, "energy": energy, "speechiness": speechiness}
         
         #artist flag passed limited to 10 results
         if artist:

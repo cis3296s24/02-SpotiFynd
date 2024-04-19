@@ -20,10 +20,11 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                    acousticness: str = typer.Option(None,'-ac', '--acoustic'),
                    liveness: str = typer.Option(None, '-l', '--liveness'),
                    energy: str = typer.Option(None, '-e', '--energy'),
+                   speechiness: str = typer.Option(None, '-sp', '--speechiness'),
                    help: str = typer.Option(None, '-h', '--help'),
                    save: bool = None,
                    load: bool = None):
-    get_top_tracks(artist, song, pitch, tempo, danceability, time_signature, acousticness, liveness, energy, help, save, load)
+    get_top_tracks(artist, song, pitch, tempo, danceability, time_signature, acousticness, liveness, energy, speechiness, help, save, load)
 
 number = float | int
 
@@ -87,7 +88,7 @@ def search(
 
         artists: str = typer.Option(None, "-a", "--artists", help="Results will be tracks by similar artists.", parser=artists_from_string),
         genres: str = typer.Option(None, "-g", "--genres", help="Results will be in this genre.", parser=genres_from_string),
-        tracks: str = typer.Option(None, "-t", "--tracks", help="Results will be similar to these tracks.", parser=tracks_from_string),
+        tracks: str = typer.Option(None, "-s", "--songs", help="Results will be similar to these tracks.", parser=tracks_from_string),
 
         acousticness=feature("acousticness", 0.0, 1.0),
         danceability=feature("danceability", 0.0, 1.0),

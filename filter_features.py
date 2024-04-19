@@ -68,3 +68,13 @@ def filter_energy(track_info, features, energy):
     if min_energy <= features["energy"] <= max_energy:
         track_info["Energy"] = features["energy"]
     return track_info
+
+#For filtering song speechiness
+def filter_speechiness(track_info, features, speechiness):
+    min_speechiness, max_speechiness = map(float, speechiness.split('-'))
+    #Check to make sure speechiness is within given range 0-1
+    if min_speechiness < 0.0 or max_speechiness > 1.0:
+        raise ValueError(f"Speechiness outside scope. Values must be between 0.0 and 1.0. Ex: 0.2-0.8")
+    if min_speechiness <= features["speechiness"] <= max_speechiness:
+        track_info["Speechiness"] = features["speechiness"]
+    return track_info 

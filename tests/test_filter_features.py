@@ -1,6 +1,6 @@
 #used to test filter_features.py
 import pytest
-from filter_features import filter_pitch, filter_tempo, filter_danceability, filter_acousticness, filter_time_signature, filter_liveness, filter_energy
+from filter_features import filter_pitch, filter_tempo, filter_danceability, filter_acousticness, filter_time_signature, filter_liveness, filter_energy, filter_speechiness
 
 #Tests will set the features of a song and then filter the song based on the feature
 def test_filter_pitch():
@@ -51,3 +51,10 @@ def test_filter_energy():
     energy = "0.1-0.9"
     result = filter_energy(track_info, features, energy)
     assert result["Energy"] == 0.5
+    
+def test_speechiness():
+    track_info = {}
+    features = {"speechiness": 0.5}
+    speechiness = "0.1-0.9"
+    result = filter_speechiness(track_info, features, speechiness)
+    assert result["Speechiness"] == 0.5
