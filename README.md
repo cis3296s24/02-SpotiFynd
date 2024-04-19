@@ -18,7 +18,7 @@ Proof of feasibility: https://github.com/tuo20482/spotify-data-cli
 
 3. Click on ‘Create an app’.
 
-4. Pick an ‘App name’ and ‘App description’ of your choice and mark the checkboxes. For your URI you can use http://localhost/.
+4. Pick an ‘App name’ and ‘App description’ of your choice and mark the checkboxes. For your URI you can use http://localhost/3000.
 
 5. After creation, you see your ‘Client Id’ and you can click on ‘Show client secret` to unhide your ’Client secret’.
 
