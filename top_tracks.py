@@ -1,11 +1,12 @@
 import typer
+from spotipy import Spotify
 from save_load import save_filters, load_filters
 from utility import uri_from_search, filter_handlers
-from track_info import get_track_info_and_features, spotify
+from track_info import get_track_info_and_features
 from dataframe import create_dataframe
 
 
-def get_top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
+def get_top_tracks(spotify: Spotify, artist: str = typer.Option(None, '-a', '--artist'),
                song: str = typer.Option(None, '-s', '--song'),
                pitch: str = typer.Option(None, '-p', '--pitch'),
                tempo: str = typer.Option(None, '-t', '--tempo'),

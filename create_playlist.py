@@ -1,32 +1,10 @@
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth
+from spotipy import Spotify
 import pandas as pd
-from dataframe import create_dataframe
-from credentials import cred
 
-def create_playlist(name:str = "test-playlist", is_public:bool = True)->str:
-    cred.scope = "playlist-modify-private playlist-modify-public"
-    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
-            client_id=cred.client_id,
-            client_secret=cred.client_secret,
-            username=cred.username,
-            redirect_uri=cred.redirect_uri,
-            scope = cred.scope
-        )
-    )
+def create_playlist(sp: Spotify, name:str = "test-playlist", is_public:bool = True)->str:
     return sp.user_playlist_create(user=sp.current_user()["id"], name=name, public=is_public)["id"]
 
-def get_playlists_info()->pd.DataFrame:
-    cred.scope = "user-top-read"
-    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
-            client_id=cred.client_id,
-            client_secret=cred.client_secret,
-            username=cred.username,
-            redirect_uri=cred.redirect_uri,
-            scope = cred.scope
-        )
-    )
-
+def get_playlists_info(sp: Spotify)->pd.DataFrame:
     results = sp.current_user_playlists(limit=10, offset=0)
     playlist_name = []
     playlist_id = []
@@ -46,16 +24,7 @@ def get_playlists_info()->pd.DataFrame:
 
     return df
 
-def add_to_playlist(playlist_id:str, position:int = 0)->int:
-    #Remove later after testing
-    cred.scope = "playlist-modify-private playlist-modify-public"
-    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
-        client_id=cred.client_id,
-        client_secret=cred.client_secret,
-        username=cred.username,
-        redirect_uri=cred.redirect_uri,
-        scope = cred.scope
-        ))
+def add_to_playlist(sp: Spotify, playlist_id:str, position:int = 0)->int:
     songs = []
     dfs = pd.read_html("df.html", encoding="utf-8")
     df = dfs[0]  # Assuming the first table is the one you want

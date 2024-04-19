@@ -2,11 +2,10 @@
 #it is used in main.py to get the track information and features for the top_tracks command
 #as well as handle the API key bypass or input
 import spotipy
-import skip_auth
-spotify = spotipy.Spotify(auth=skip_auth.access_token()) 
+from spotipy import Spotify
 
 #Retrieves track information and features from the Spotify API
-def get_track_info_and_features(ids: list):
+def get_track_info_and_features(spotify: Spotify, ids: list):
     all_info = [] #list of both track info and features
 
     # Split ids into batches of 100

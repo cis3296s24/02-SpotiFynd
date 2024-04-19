@@ -1,15 +1,12 @@
 import collections
 import spotipy
+from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 from dataframe import create_dataframe
-from credentials import cred
 
 pitch_names = ['C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B']
 
-def generate_user_tracks(limit=50):
-    #Create a Spotify object with the user's credentials
-    user_spotify = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=cred.client_id, client_secret=cred.client_secret, redirect_uri=cred.redirect_uri, scope=cred.scope))
-
+def generate_user_tracks(user_spotify: Spotify, limit=50):
     #Retrieve the user's saved tracks
     saved_tracks = user_spotify.current_user_saved_tracks()
     saved_track_ids = set(track['track']['id'] for track in saved_tracks['items'])

@@ -1,11 +1,19 @@
 import typer
-from spotipy.oauth2 import SpotifyClientCredentials
+
+from check_auth import check_auth
 from dataframe import create_dataframe
-from track_info import spotify
-from utility import uri_from_search, filter_handlers
+from spotipy_fix import spotipy_fix
+from utility import uri_from_search
 from create_playlist import create_playlist, add_to_playlist
 from user_tracks import generate_user_tracks
 from top_tracks import get_top_tracks
+from spotipy import Spotify
+from skip_auth import access_token
+
+spotify = Spotify(auth=access_token())
+spotipy_fix(spotify)
+
+
 
 app = typer.Typer()
 
@@ -24,7 +32,7 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                    help: str = typer.Option(None, '-h', '--help'),
                    save: bool = None,
                    load: bool = None):
-    get_top_tracks(artist, song, pitch, tempo, danceability, time_signature, acousticness, liveness, energy, speechiness, help, save, load)
+    get_top_tracks(spotify, artist, song, pitch, tempo, danceability, time_signature, acousticness, liveness, energy, speechiness, help, save, load)
 
 number = float | int
 
@@ -56,11 +64,11 @@ def feature(name: str, minimum: number, maximum: number):
 
 
 def artists_from_string(string: str) -> list[str]:
-    return [uri_from_search(artist.strip(), "artist")[0] for artist in string.split(",")]
+    return [uri_from_search(spotify, artist.strip(), "artist")[0] for artist in string.split(",")]
 
 
 def tracks_from_string(string: str) -> list[str]:
-    return [uri_from_search(track.strip(), "track")[0] for track in string.split(",")]
+    return [uri_from_search(spotify, track.strip(), "track")[0] for track in string.split(",")]
 
 
 def genres_from_string(string: str) -> list[str]:
@@ -147,11 +155,11 @@ def search(
     
 @app.command()
 def suggest(limit: int = typer.Option(50, '-l', '--limit')):
-    generate_user_tracks(limit)
+    generate_user_tracks(check_auth(spotify), limit)
 
 @app.command()
-def playlist(name:str = typer.Option(None, "-n", "--name")):
-    new_playlist = create_playlist(name)
+def playlist(name: str = typer.Option(None, "-n", "--name")):
+    new_playlist = create_playlist(check_auth(spotify), name)
     add_to_playlist(new_playlist)
 
 if __name__ == "__main__":
