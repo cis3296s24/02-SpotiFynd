@@ -21,7 +21,7 @@ def get_track_info_and_features(ids: list):
                 "Art": track["album"]["images"][0]["url"],
                 "Artist": track["artists"][0]["name"], 
                 "Song": track["name"],
-                "URI": track["uri"],
+                "uri": track["uri"],
             }
             all_info.append((track_info, features[i])) #appends track info and features to all_info
 
