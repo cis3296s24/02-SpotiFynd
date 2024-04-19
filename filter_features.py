@@ -1,7 +1,7 @@
 #filter_features.py contains all of the filtering functions used by top_tracks in main.py.
 #When adding a new filter, you must add it in main.py to:
-#1. filter_handlers dictionary above top_tracks
-#2. potential arguments in the top_tracks function
+#1. filter_handlers dictionary in utility.py
+#2. potential arguments in the top_tracks function in top_tracks.py
 #3. flags passed section (elif song or tempo or ...) in top_tracks
 #4. flags dictionary in top_tracks
 
@@ -77,4 +77,5 @@ def filter_speechiness(track_info, features, speechiness):
         raise ValueError(f"Speechiness outside scope. Values must be between 0.0 and 1.0. Ex: 0.2-0.8")
     if min_speechiness <= features["speechiness"] <= max_speechiness:
         track_info["Speechiness"] = features["speechiness"]
-    return track_info
+    return track_info 
+
