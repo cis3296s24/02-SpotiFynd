@@ -1,8 +1,6 @@
 import typer
-from spotipy.oauth2 import SpotifyClientCredentials
 from dataframe import create_dataframe
-from track_info import spotify
-from utility import uri_from_search, filter_handlers
+from utility import artists_from_string, genres_from_string, tracks_from_string, feature
 from create_playlist import create_playlist, add_to_playlist
 from user_tracks import generate_user_tracks
 from top_tracks import get_top_tracks
@@ -25,46 +23,6 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                    save: bool = None,
                    load: bool = None):
     get_top_tracks(artist, song, pitch, tempo, danceability, time_signature, acousticness, liveness, energy, speechiness, help, save, load)
-
-number = float | int
-
-
-def feature(name: str, minimum: number, maximum: number):
-    short_flag = f"-{name[:2]}"
-    long_flag = f"--{name}"
-    convert = type(minimum)
-
-    # create a custom parser for the inputted audio feature
-    def number_range(value: str) -> tuple[number | None, number | None] | number:
-        if "-" in value:  # Range provided
-            low, high = value.split("-")
-
-            low = convert(low) if low else None
-            high = convert(high) if high else None
-
-            if low is not None and low < minimum or high is not None and high > maximum:
-                raise ValueError
-            return low, high
-
-        # Single value provided
-        value = convert(value)
-        if not minimum <= value <= maximum:
-            raise ValueError
-        return value
-
-    return typer.Option(None, short_flag, long_flag, help=f"{minimum} to {maximum}", parser=number_range)
-
-
-def artists_from_string(string: str) -> list[str]:
-    return [uri_from_search(artist.strip(), "artist")[0] for artist in string.split(",")]
-
-
-def tracks_from_string(string: str) -> list[str]:
-    return [uri_from_search(track.strip(), "track")[0] for track in string.split(",")]
-
-
-def genres_from_string(string: str) -> list[str]:
-    return [genre.strip() for genre in string.split(",")]
 
 
 @app.command(help="""
@@ -150,9 +108,10 @@ def suggest(limit: int = typer.Option(50, '-l', '--limit')):
     generate_user_tracks(limit)
 
 @app.command()
-def playlist(name:str = typer.Option(None, "-n", "--name")):
+def playlist(name: str = typer.Option(None, "-n", "--name")):
     new_playlist = create_playlist(name)
     add_to_playlist(new_playlist)
+
 
 if __name__ == "__main__":
     app()
