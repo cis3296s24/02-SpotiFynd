@@ -1,9 +1,9 @@
 import typer
 from save_load import save_filters, load_filters
 from utility import uri_from_search, filter_handlers
-from track_info import get_track_info_and_features, spotify
+from track_info import get_track_info_and_features
 from dataframe import create_dataframe
-
+from pkce import spotify
 
 def get_top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                song: str = typer.Option(None, '-s', '--song'),

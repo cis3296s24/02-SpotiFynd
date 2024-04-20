@@ -4,6 +4,7 @@ from utility import artists_from_string, genres_from_string, tracks_from_string,
 from create_playlist import create_playlist, add_to_playlist
 from user_tracks import generate_user_tracks
 from top_tracks import get_top_tracks
+from pkce import spotify
 
 app = typer.Typer()
 

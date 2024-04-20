@@ -1,14 +1,16 @@
-import spotipy
+from requests import Session
+from spotipy import Spotify, SpotifyPKCE
 
-from spotipy_fix import spotipy_fix
+client_id = "52bd7638025f4ce088463655b18efc50"
+redirect_uri = "http://localhost:8888/callback/"
+scope = "user-library-read user-top-read playlist-modify-public playlist-modify-private"
+state = None
 
-auth_m = spotipy.SpotifyPKCE(client_id="52bd7638025f4ce088463655b18efc50",
-                             redirect_uri="http://localhost:8888/callback/",
-                             scope="user-library-read user-top-read playlist-modify-public playlist-modify-private")
+spotify = Spotify(auth_manager=SpotifyPKCE(client_id, redirect_uri, state, scope))
 
-spotify = spotipy.Spotify(auth_manager=auth_m)
-spotipy_fix(spotify)
+def fixed_del(self):
+    if isinstance(self._session, Session):
+        self._session.close()
 
-results = spotify.current_user_top_tracks()
 
-print(results)
+spotify.__del__ = fixed_del.__get__(spotify, Spotify)
