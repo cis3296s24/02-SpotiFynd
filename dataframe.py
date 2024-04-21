@@ -1,7 +1,6 @@
 import pandas as pd
 import webbrowser
 import os
-from IPython.display import HTML
 
 def create_dataframe(track_data):
     

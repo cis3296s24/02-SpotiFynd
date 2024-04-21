@@ -8,6 +8,7 @@ state = None
 
 spotify = Spotify(auth_manager=SpotifyPKCE(client_id, redirect_uri, state, scope))
 
+
 def fixed_del(self):
     if isinstance(self._session, Session):
         self._session.close()

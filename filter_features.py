@@ -79,3 +79,15 @@ def filter_speechiness(track_info, features, speechiness):
         track_info["Speechiness"] = features["speechiness"]
     return track_info 
 
+
+filter_handlers = {
+    "pitch": filter_pitch,
+    "tempo": filter_tempo,
+    "danceability": filter_danceability,
+    "acousticness": filter_acousticness,
+    "time_signature": filter_time_signature,
+    "liveness": filter_liveness,
+    "energy": filter_energy,
+    "speechiness": filter_speechiness
+}
+
