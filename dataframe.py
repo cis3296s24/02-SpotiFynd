@@ -13,8 +13,9 @@ def create_dataframe(track_data):
     #Offset the DataFrame index so the top row is 1
     df.index += 1
 
-    #Setting song names to be hyperlinks to blank pages.
-    df["Song"] = df["Song"].apply(lambda name: f'<a href="about:blank" target="_blank">{name}</a>')
+    #Setting song names to be hyperlinks to the song's URI.
+    df['Song'] = df.apply(lambda x: f'<a href="{x["uri"]}">{x["Song"]}</a>', axis=1)
+    df.drop(columns=['uri'], inplace=True)
     
     #Convert the DataFrame to HTML and center the text
     df_html = df.to_html(classes='mystyle', escape=False)

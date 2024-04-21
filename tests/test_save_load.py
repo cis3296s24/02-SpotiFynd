@@ -17,22 +17,21 @@ def test_save_and_load_filters():
     acousticness = "0.1-0.3"
     energy = "0.8-1.0"
 
-    #Save the filters with the above values
-    save_filters(pitch, tempo, danceability, time_signature, acousticness, energy)
+    filters = locals()
 
-    #Set filters to be saved
-    save_filters(pitch, tempo, danceability, time_signature, acousticness, energy)
+    #Save the filters with the above values
+    save_filters(**filters)
 
     #Load the filters saved above
-    loaded_pitch, loaded_tempo, loaded_danceability, loaded_time_signature, loaded_acousticness, loaded_energy = load_filters()
+    loaded_filters = load_filters()
 
     #Check that loaded and saved values are the same
-    assert pitch == loaded_pitch
-    assert tempo == loaded_tempo
-    assert danceability == loaded_danceability
-    assert time_signature == loaded_time_signature
-    assert acousticness == loaded_acousticness
-    assert energy == loaded_energy
+    assert pitch == loaded_filters["pitch"]
+    assert tempo == loaded_filters["tempo"]
+    assert danceability == loaded_filters["danceability"]
+    assert time_signature == loaded_filters["time_signature"]
+    assert acousticness == loaded_filters["acousticness"]
+    assert energy == loaded_filters["energy"]
 
     #Remove the testing file
     os.remove("data.json")

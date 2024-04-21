@@ -51,3 +51,36 @@ def tracks_from_string(string: str) -> list[str]:
 
 def genres_from_string(string: str) -> list[str]:
     return [genre.strip() for genre in string.split(",")]
+
+def basic_track_info(track: dict) -> dict:
+    return {
+                "Art": track["album"]["images"][0]["url"],
+                "Artists": ", ".join(artist["name"] for artist in track["artists"]),
+                "Song": track["name"],
+                "uri": track["uri"],
+            }
+
+def get_track_info_and_features(ids: list):
+    all_info = []  # list of both track info and features
+
+    # Split ids into batches of 100
+    id_batches = [ids[i:i + 100] for i in range(0, len(ids), 100)]
+
+    for id_batch in id_batches:
+        all_tracks = spotify.tracks(id_batch)["tracks"]  # for artist, song, album
+        all_features = spotify.audio_features(id_batch)  # for tempo, pitch, etc
+
+        for track, features in zip(all_tracks, all_features):
+            all_info.append((basic_track_info(track), features))  # appends track info and features to all_info
+
+    return all_info
+
+def create_dict(track_ids, audio_features):
+    all_info = get_track_info_and_features(track_ids)
+    track_data = []
+    for track_info, features in all_info:
+        for audio_feature in audio_features:
+            source = track_info if audio_features == "popularity" else features
+            track_info[audio_feature] = source[audio_feature]
+        track_data.append(track_info)
+    return track_data

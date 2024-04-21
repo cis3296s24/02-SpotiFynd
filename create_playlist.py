@@ -27,5 +27,5 @@ def get_playlists_info() -> pd.DataFrame:
     return df
 
 def add_to_playlist(playlist_id: str, position: int = 0) -> None:
-    songs = [uri for uri in pd.read_html("df.html", encoding="utf-8")[0]["uri"]]
+    songs = [uri for song, uri in pd.read_html("df.html", encoding="utf-8", extract_links="body")[0]["Song"]]
     spotify.playlist_add_items(playlist_id, songs, position)
