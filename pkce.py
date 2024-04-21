@@ -1,8 +1,8 @@
 from requests import Session
 from spotipy import Spotify, SpotifyPKCE
 
-client_id = "52bd7638025f4ce088463655b18efc50"
-redirect_uri = "http://localhost:8888/callback/"
+client_id = "52bd7638025f4ce088463655b18efc50"  # no need to replace this with your own client_id
+redirect_uri = "http://localhost:8888/callback/"  # same for this one
 scope = "user-library-read user-top-read playlist-modify-public playlist-modify-private"
 state = None
 
