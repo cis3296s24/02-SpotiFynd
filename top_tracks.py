@@ -15,7 +15,6 @@ def get_top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                liveness: str = typer.Option(None, '-l', '--liveness'),
                energy: str = typer.Option(None, '-e', '--energy'),
                speechiness: str = typer.Option(None, '-sp', '--speechiness'),
-               help: str = typer.Option(None, '-h', '--help'),
                save: bool = None,
                load: bool = None,
                ):

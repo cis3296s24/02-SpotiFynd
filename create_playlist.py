@@ -25,11 +25,5 @@ def get_playlists_info() -> pd.DataFrame:
     return df
 
 def add_to_playlist(playlist_id: str, position: int = 0):
-    songs = []
-    dfs = pd.read_html("df.html", encoding="utf-8")
-    df = dfs[0]  # Assuming the first table is the one you want
-    uris = df['uri']
-    for uri in uris:
-        songs.append(uri)
-        
-    spotify.playlist_add_items(playlist_id=playlist_id, items=songs, position=position)
+    songs = [uri for song, uri in pd.read_html("df.html", encoding="utf-8", extract_links="body")[0]["Song"]]
+    spotify.playlist_add_items(playlist_id, songs, position)

@@ -10,7 +10,7 @@ def test_create_dataframe():
         "Artist": ["Artist1", "Artist2"],
         "Song": ["Song1", "Song2"],
         "Key": ["Key1", "Key2"],
-        "URI": ["URI1", "URI2"]
+        "uri": ["URI1", "URI2"]
     }
 
     #Creating this dataframe will also output it to an HTML file per dataframe.py
@@ -18,11 +18,8 @@ def test_create_dataframe():
 
     #Assert that datafram has been created with the always defined values.
     assert isinstance(df, pd.DataFrame)
-    assert list(df.columns) == ["Art", "Artist", "Song", "Key", "URI"]
+    assert list(df.columns) == ["Art", "Artist", "Song", "Key"]
     assert len(df) == 2
 
     #Check that the HTML file has been created
     assert os.path.exists('df.html')
-
-    #Delete the HTML file
-    os.remove('df.html')

@@ -4,7 +4,7 @@ from pkce import spotify
 
 def uri_from_search(name: str, search_type: str):
     #limit determines amount of results, artist and album are limited to 10 results via API
-    results = spotify.search(q=f"{search_type}:" + name, type=search_type, limit=50)
+    results = spotify.search(q=f"{search_type}:{name}", type=search_type, limit=50)
     items = results[search_type + "s"]["items"]
     #prints the amount of results
     if len(items) > 0:

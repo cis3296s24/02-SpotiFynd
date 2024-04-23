@@ -20,10 +20,9 @@ def top_tracks(artist: str = typer.Option(None, '-a', '--artist'),
                    liveness: str = typer.Option(None, '-l', '--liveness'),
                    energy: str = typer.Option(None, '-e', '--energy'),
                    speechiness: str = typer.Option(None, '-sp', '--speechiness'),
-                   help: str = typer.Option(None, '-h', '--help'),
                    save: bool = None,
                    load: bool = None):
-    get_top_tracks(artist, song, pitch, tempo, danceability, time_signature, acousticness, liveness, energy, speechiness, help, save, load)
+    get_top_tracks(artist, song, pitch, tempo, danceability, time_signature, acousticness, liveness, energy, speechiness, save, load)
 
 
 @app.command(help="""
@@ -93,7 +92,7 @@ def search(
     for track in results["tracks"]:
         track_info = {
             "Art": track["album"]["images"][0]["url"],
-            "Artist": track["artists"][0]["name"],
+            "Artists": ", ".join(artist["name"] for artist in track["artists"]),
             "Song": track["name"],
             "uri": track["uri"],
         }
