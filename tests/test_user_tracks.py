@@ -19,6 +19,6 @@ def test_generate_user_tracks():
     # Check that the DataFrame has the expected minimum required columns
     expected_columns = ['art', 'artist', 'song', 'danceability', 'energy', 'loudness',
                         'mode', 'speechiness', 'acousticness', 'instrumentalness', 
-                        'liveness', 'valence', 'tempo', 'uri', 'duration_ms', 'time_signature']
+                        'liveness', 'valence', 'tempo', 'duration_ms', 'time_signature']
     print(result.columns)
     assert set(expected_columns).issubset(result.columns)

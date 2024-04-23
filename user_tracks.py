@@ -48,7 +48,7 @@ def generate_user_tracks(limit=50):
         #Else add it to be output to dataframe
         track_info = {
             "Art": track["album"]["images"][0]["url"],
-            "Artist": track["artists"][0]["name"],
+            "Artists": ", ".join(artist["name"] for artist in track["artists"]),
             "Song": track["name"],
             "Key": pitch_names[track_audio_features['key']] if track_audio_features['key'] is not None else None,
         }

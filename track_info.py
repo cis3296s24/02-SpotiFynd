@@ -1,11 +1,11 @@
 #track_info is responsible for getting track information and features from the Spotify API
 #it is used in main.py to get the track information and features for the top_tracks command
 #as well as handle the API key bypass or input
-from spotipy import Spotify
+from pkce import spotify
 
 
 #Retrieves track information and features from the Spotify API
-def get_track_info_and_features(spotify: Spotify, ids: list):
+def get_track_info_and_features(ids: list):
     all_info = [] #list of both track info and features
 
     # Split ids into batches of 100
@@ -18,7 +18,7 @@ def get_track_info_and_features(spotify: Spotify, ids: list):
         for i, track in enumerate(results["tracks"]):
             track_info = {
                 "Art": track["album"]["images"][0]["url"],
-                "Artist": track["artists"][0]["name"], 
+                "Artists": ", ".join(artist["name"] for artist in track["artists"]),
                 "Song": track["name"],
                 "uri": track["uri"],
             }

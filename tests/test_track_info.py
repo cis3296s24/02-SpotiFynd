@@ -15,4 +15,4 @@ def test_get_track_info_and_features():
         track_info, features = info
         assert isinstance(track_info, dict)
         assert isinstance(features, dict)
-        assert set(track_info.keys()) == {"Art", "Artist", "Song", "URI"}
+        assert set(track_info.keys()) == {"Art", "Artists", "Song", "uri"}
