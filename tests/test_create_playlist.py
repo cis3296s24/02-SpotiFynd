@@ -1,4 +1,3 @@
-import pytest
 from create_playlist import create_playlist, get_playlists_info, add_to_playlist
 
 #Test playlist creation

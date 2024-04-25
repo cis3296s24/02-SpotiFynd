@@ -1,5 +1,4 @@
 #used for testing the user_tracks.py file. Assumes that the credentials.py file is working correctly as is dependent on it.
-import pytest
 import pandas as pd
 from user_tracks import generate_user_tracks
 

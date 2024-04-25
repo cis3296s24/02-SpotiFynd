@@ -1,12 +1,5 @@
 #used to test save_load.py
 import os
-import json
-from save_load import save_filters, load_filters
-
-def test_save_and_load_filters():
-    #set filters to be saved
-    import os
-import json
 from save_load import save_filters, load_filters
 
 def test_save_and_load_filters():

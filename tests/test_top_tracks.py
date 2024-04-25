@@ -1,4 +1,3 @@
-import pytest
 from main import top_tracks
 
 def test_top_tracks():
