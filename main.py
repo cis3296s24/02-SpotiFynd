@@ -11,7 +11,7 @@ from utility import (
     tracks_from_string,
     feature,
     uri_from_search,
-    create_dict
+    create_track_data
 )
 
 app = Typer()
@@ -68,7 +68,7 @@ def top_tracks(
     artist_id = uri_from_search(artist, "artist")[0]
     tracks = spotify.artist_top_tracks(artist_id)["tracks"]
     track_ids = [track["id"] for track in tracks]
-    track_data = create_dict(track_ids, searched_audio_features)
+    track_data = create_track_data(track_ids, searched_audio_features)
 
     for audio_feature, value in searched_audio_features.items():
         try:
@@ -165,7 +165,7 @@ def similar(
     )
 
     track_ids = [track["id"] for track in results["tracks"]]
-    track_data = create_dict(track_ids, searched_audio_features)
+    track_data = create_track_data(track_ids, searched_audio_features)
 
     create_dataframe(track_data)
 

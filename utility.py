@@ -80,10 +80,10 @@ def get_track_info_and_features(ids: list):
     return all_info
 
 
-def create_dict(track_ids, audio_features):
-    all_info = get_track_info_and_features(track_ids)
+def create_track_data(track_ids: list, audio_features: iter) -> list[dict]:
+    track_info_and_features = get_track_info_and_features(track_ids)
     track_data = []
-    for track_info, features in all_info:
+    for track_info, features in track_info_and_features:
         for audio_feature in audio_features:
             source = track_info if audio_features == "popularity" else features
             track_info[audio_feature] = source[audio_feature]
