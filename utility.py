@@ -1,11 +1,13 @@
 from typer import Option
+
 from pkce import spotify
 
+
 def uri_from_search(name: str, search_type: str):
-    #limit determines amount of results, artist and album are limited to 10 results via API
+    # limit determines amount of results, artist and album are limited to 10 results via API
     results = spotify.search(q=f"{search_type}:{name}", type=search_type, limit=50)
     items = results[f"{search_type}s"]["items"]
-    #prints the amount of results
+    # prints the amount of results
     if len(items) > 0:
         return [item["id"] for item in items]
     else:
@@ -52,13 +54,15 @@ def tracks_from_string(string: str) -> list[str]:
 def genres_from_string(string: str) -> list[str]:
     return [genre.strip() for genre in string.split(",")]
 
+
 def basic_track_info(track: dict) -> dict:
     return {
-                "Art": track["album"]["images"][0]["url"],
-                "Artists": ", ".join(artist["name"] for artist in track["artists"]),
-                "Song": track["name"],
-                "uri": track["uri"],
-            }
+        "Art": track["album"]["images"][0]["url"],
+        "Artists": ", ".join(artist["name"] for artist in track["artists"]),
+        "Song": track["name"],
+        "uri": track["uri"],
+    }
+
 
 def get_track_info_and_features(ids: list):
     all_info = []  # list of both track info and features
@@ -74,6 +78,7 @@ def get_track_info_and_features(ids: list):
             all_info.append((basic_track_info(track), features))  # appends track info and features to all_info
 
     return all_info
+
 
 def create_dict(track_ids, audio_features):
     all_info = get_track_info_and_features(track_ids)

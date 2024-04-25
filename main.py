@@ -1,6 +1,10 @@
 from typer import Option, Typer
+
+from create_playlist import create_playlist, add_to_playlist
 from dataframe import create_dataframe
+from pkce import spotify
 from save_load import load_filters, save_filters
+from user_tracks import generate_user_tracks
 from utility import (
     artists_from_string,
     genres_from_string,
@@ -9,9 +13,6 @@ from utility import (
     uri_from_search,
     create_dict
 )
-from create_playlist import create_playlist, add_to_playlist
-from user_tracks import generate_user_tracks
-from pkce import spotify
 
 app = Typer()
 
@@ -32,6 +33,7 @@ VALENCE = feature("valence", 0.0, 1.0)
 
 SAVE = Option(False, help="Save this set of filters to be used later with --load.")
 LOAD = Option(False, help="Load the saved set of filters for this search.")
+
 
 @app.command()
 def top_tracks(
@@ -105,9 +107,12 @@ For example, -a "artist1, artist2" will return tracks by artists similar to arti
 def similar(
         limit: int = Option(20, "-l", "--limit", help="Number of results to return."),
 
-        artists: str = Option(None, "-a", "--artists", help="Results will be tracks by similar artists.", parser=artists_from_string),
-        genres: str = Option(None, "-g", "--genres", help="Results will be in similar genres.", parser=genres_from_string),
-        tracks: str = Option(None, "-s", "--songs", help="Results will be similar to these tracks.", parser=tracks_from_string),
+        artists: str = Option(None, "-a", "--artists", help="Results will be tracks by similar artists.",
+                              parser=artists_from_string),
+        genres: str = Option(None, "-g", "--genres", help="Results will be in similar genres.",
+                             parser=genres_from_string),
+        tracks: str = Option(None, "-s", "--songs", help="Results will be similar to these tracks.",
+                             parser=tracks_from_string),
 
         save: bool = SAVE,
         load: bool = LOAD,
