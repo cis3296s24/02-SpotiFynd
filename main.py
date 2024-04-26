@@ -37,7 +37,16 @@ LOAD = Option(False, help="Load the saved set of filters for this search.")
 
 @app.command()
 def top_tracks(
-        artist: str,
+        artist: str = Option(
+            None,
+            '-a',
+            '--artist'
+        ),
+        song: str = Option(
+            None,
+            '-s',
+            '--song'
+        ),
 
         save: bool = SAVE,
         load: bool = LOAD,
@@ -57,7 +66,10 @@ def top_tracks(
         time_signature=TIME_SIGNATURE,
         valence=VALENCE,
 ):
-    non_audio_features = {"artist", "save", "load", "non_audio_features"}
+    if bool(song is None) == bool(artist is None):
+        raise ValueError("Exactly one of {artist, song} is required.")
+
+    non_audio_features = {"artist", "song", "save", "load", "non_audio_features"}
     searched_audio_features = {k: v for k, v in locals().items() if k not in non_audio_features and v is not None}
 
     if save:
@@ -65,9 +77,13 @@ def top_tracks(
     if load:
         searched_audio_features = load_filters()
 
-    artist_id = uri_from_search(artist, "artist")[0]
-    tracks = spotify.artist_top_tracks(artist_id)["tracks"]
-    track_ids = [track["id"] for track in tracks]
+    if song is not None:  # Song search
+        track_ids = uri_from_search(song, "track")
+    else:  # Artist search
+        artist_id = uri_from_search(artist, "artist")[0]
+        tracks = spotify.artist_top_tracks(artist_id)["tracks"]
+        track_ids = [track["id"] for track in tracks]
+
     track_data = create_track_data(track_ids, searched_audio_features)
 
     for audio_feature, value in searched_audio_features.items():
@@ -105,14 +121,34 @@ For artists, genres, and tracks, you can provide a comma-separated list
 For example, -a "artist1, artist2" will return tracks by artists similar to artist1 and artist2.
 """)
 def similar(
-        limit: int = Option(20, "-l", "--limit", help="Number of results to return."),
+        limit: int = Option(
+            20,
+            "-l",
+            "--limit",
+            help="Number of results to return."
+        ),
 
-        artists: str = Option(None, "-a", "--artists", help="Results will be tracks by similar artists.",
-                              parser=artists_from_string),
-        genres: str = Option(None, "-g", "--genres", help="Results will be in similar genres.",
-                             parser=genres_from_string),
-        tracks: str = Option(None, "-s", "--songs", help="Results will be similar to these tracks.",
-                             parser=tracks_from_string),
+        artists: str = Option(
+            None,
+            "-a",
+            "--artists",
+            help="Results will be tracks by similar artists.",
+            parser=artists_from_string
+        ),
+        genres: str = Option(
+            None,
+            "-g",
+            "--genres",
+            help="Results will be in similar genres.",
+            parser=genres_from_string
+        ),
+        tracks: str = Option(
+            None,
+            "-s",
+            "--songs",
+            help="Results will be similar to these tracks.",
+            parser=tracks_from_string
+        ),
 
         save: bool = SAVE,
         load: bool = LOAD,
