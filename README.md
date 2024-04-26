@@ -9,20 +9,6 @@ Proof of feasibility: https://github.com/tuo20482/spotify-data-cli
 - Python 3.8 or higher
 - A Spotify Developer account to provide your own Client ID and Client Secret for accessing the Spotify Web API
 
-## Configuration
-
-*** To get a client ID and client secret, you must sign up for Spotipy's web API. Follow below instructions to do so. ***
-1. Browse to https://developer.spotify.com/dashboard/applications.
-
-2. Log in with your Spotify account.
-
-3. Click on ‘Create an app’.
-
-4. Pick an ‘App name’ and ‘App description’ of your choice and mark the checkboxes. For your URI you can use http://localhost/3000.
-
-5. After creation, you see your ‘Client Id’ and you can click on ‘Show client secret` to unhide your ’Client secret’.
-
-6. Use your ‘Client id’ and ‘Client secret’ to retrieve a token from the Spotify API.
 
 ## Installation
 1. Clone this repository to your local machine.
@@ -47,6 +33,12 @@ python -m venv venv
 ```
 pip install -r requirements.txt
 ```
+
+## Login & Authentication
+The first time running any command will prompt the user to login to their Spotify account and allow SpotiFynd application access.
+
+If this process fails or returns an error, it is likely due to an incompatible .cache file from a previous iteration. Delete the .cache file and attempt running a command again.
+
 
 ## Running the Application & Requirements
 - Running the program always requires a mode.
@@ -103,12 +95,13 @@ pip install -r requirements.txt
 
 ## Song Feature Flags Dictionary
 
-Artist: '-a'  or '--artist'
-Song: '-s'  or '--song'
-Pitch: '-p'  or '--pitch'
-Tempo: '-t'  or '--tempo'
-Danceability: '-d'  or '--dance'
-Acousticness: '-ac' or '--acoust' for acoustic"
-Time Signature: '-ts' or '--time_signature'
-Liveness: '-l'  or '--liveness'
-Energy'-e'  or '--energy'
+- Artist: '-a'  or '--artist'
+ Song: '-s'  or '--song'
+- Pitch: '-p'  or '--pitch'
+- Tempo: '-t'  or '--tempo'
+- Danceability: '-d'  or '--dance'
+- Acousticness: '-ac' or '--acoust' for acoustic"
+- Time Signature: '-ts' or '--time_signature'
+- Liveness: '-l'  or '--liveness'
+- Energy: '-e'  or '--energy'
+- Speechiness:'-sp' or '--speechiness'
